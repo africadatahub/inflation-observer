@@ -8,7 +8,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 
 import * as countriesList from '../data/countries.json';
 
-import { locationToUrl, urlToLocation, locationToISO } from '../utils/func.js';
+import { locationToUrl, urlToLocation } from '../utils/func.js';
 
 export class CountrySelect extends React.Component {
 

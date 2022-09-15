@@ -24,7 +24,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 
 import * as settings from '../data/settings.json';
-import { locationToUrl, urlToLocation, locationToISO } from '../utils/func.js';
+import { locationToUrl, urlToLocation } from '../utils/func.js';
 
 
 
