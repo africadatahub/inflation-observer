@@ -1,0 +1,232 @@
+$primary: #094151;
+$control-grey: #DFE6E8;
+$theme-colors: ( "primary": $primary, "control-grey": $control-grey, "warning": #ffc107, "light-grey": #f6f6f6);
+$border-radius: 6px;
+// $utilities: (
+//     "rounded": (
+//         property: border-radius,
+//         class: rounded,
+//         values: (
+//             4: 10px,
+//         )
+//     ),
+// );
+@import "bootstrap/scss/bootstrap";
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,300;0,500;0,600;1,700&display=swap');
+html {
+    font-size: 0.8rem;
+}
+
+body {
+    font-family: 'Work Sans', sans-serif;
+    background: #eceff0;
+    color: $primary;
+    min-height: 100vh;
+    position: relative;
+
+}
+
+.card {
+    color: black
+}
+
+.header {
+    background: #F8F8F8
+}
+
+.offcanvas-backdrop.show {
+    opacity: 0 !important;
+}
+
+.offcanvas-top {
+    border-bottom: none !important;
+    height: 230px;
+}
+
+.headerMenu {
+    transition: transform 0.25s ease-in-out;
+}
+
+.header-unpin {
+    display: none;
+    transform: translateY(-65px);
+}
+
+.header-pin {
+    display: block;
+    transform: translateY(0);
+}
+
+.mobile_menu_links {
+    text-align: left;
+    padding: 6em 1em 1em;
+}
+
+.mobile_menu_links button,
+.mobile_menu_social button {
+    color: $primary;
+    display: block;
+    font-size: 15px !important;
+    font-weight: 600;
+}
+
+.mobile_menu_social {
+    border-top: 1px solid #ccc;
+    padding: 1em 1em 2em;
+}
+
+.mobile_menu_social button {
+    display: inline-block;
+}
+
+.dropdown-menu {
+    height: 200px;
+    overflow-y: scroll;
+    z-index: 2000 !important;
+}
+
+
+
+h1 {
+    font-weight: 600
+}
+
+.navlinks button {
+    color: $primary;
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 0.5em;
+    padding: 0.6em 1em;
+    &:hover {
+        background: rgba(9, 65, 81, 0.1);
+        color: $primary;
+    }
+}
+
+.country-select .dropdown-toggle::after {
+    margin-left: 3em;
+}
+
+.control-grey {
+    background: $control-grey;
+}
+
+
+hr {
+    opacity: 0.1 !important;
+}
+
+.form-select {
+    background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+    background-size: unset !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.map-legend .scale-none {
+    background-color: #999 !important;
+}
+
+.accordion-item {
+    border: none !important;
+}
+
+
+/* Data Table */
+
+.rdt_TableRow,
+.rdt_TableHeadRow {
+    position: relative;
+}
+
+.rdt_TableHeadRow {
+    z-index: 14;
+}
+
+.rdt_TableCell:first-child {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+.rdt_TableHead {
+    z-index: 100 !important;
+}
+
+.rdt_TableCol:first-child {
+    position: sticky;
+    top: 0;
+    left: 0;
+    background: #fff;
+    z-index: 10;
+}
+
+.rdt_TableRow:nth-child(odd) .rdt_TableCell:first-child {
+    background: #FAFAFA;
+}
+
+.rdt_TableRow:nth-child(even) .rdt_TableCell:first-child {
+    background: #FFF;
+}
+
+
+/* Data Table Dropdowns */
+
+.rmsc {
+    border-radius: 6px !important;
+    height: 30px;
+    position: relative;
+    z-index: 999;
+}
+
+.rmsc .dropdown-container {
+    background-color: $control-grey !important;
+    border: none !important;
+    height: 30px;
+}
+
+.rmsc .dropdown-container:focus-within {
+    border-color: #84a0a8 !important;
+    outline: 0 !important;
+    box-shadow: 0 0 0 0.25rem rgb(9 65 81 / 25%) !important;
+}
+
+.rmsc .dropdown-heading {
+    height: 30px !important;
+}
+
+.form-select {
+    background-color: $control-grey !important;
+    border: none !important;
+    height: 30px;
+    border-radius: 6px;
+}
+
+
+/* Chart */
+
+.custom-tooltip {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    padding: 0.5em;
+    border-radius: 5px;
+}
+
+
+.country-select button {
+    border: 1px solid #f3f3f3;
+    background: #DFE6E8 !important;
+    color: #333;
+
+    &:hover, &:focus, &:active {
+        color: #333 !important;
+    }
+}
+
+.row-eq-height [class*="col"]{
+    display: flex;
+    flex-direction: column;
+}

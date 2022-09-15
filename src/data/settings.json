@@ -1,0 +1,68 @@
+{
+    "title": "Africa Observer: Consumer Price Inflation (CPI)",
+    "subtitle": "Search and visualise inflation indicators for African countries (2008-2022)",
+    "map": {
+        "selectedBaseMetric": "PCPI_PC_CP_A_PT"
+    },
+    "leaderboard": {
+        "selectedBaseMetric": "PCPI_PC_CP_A_PT"
+    },
+    "countryChart": {
+        "selectedBaseMetric": "PCPI_PC_CP_A_PT"
+    },
+    "api": {
+        "url": "https://ckan.africadatahub.org/api/3/",
+        "overviewData": "7bcead8b-42c2-422d-b23a-549481cbe4bd",
+        "countryData": "7bcead8b-42c2-422d-b23a-549481cbe4bd"
+    },
+    "indicators": [
+        {
+            "indicator_name": "Consumer Price Index, All items",
+            "indicator_code": "PCPI_PC_CP_A_PT"
+        },
+        {
+            "indicator_name": "Food and non-alcoholic beverages",
+            "indicator_code": "PCPIF_PC_CP_A_PT"
+        },
+        {
+            "indicator_name": "Housing, Water, Electricity, Gas and Other Fuels",
+            "indicator_code": "PCPIH_PC_CP_A_PT"
+        },
+        {
+            "indicator_name": "Furnishings, household equipment and routine household maintenance",
+            "indicator_code": "PCPIHO_PC_CP_A_PT"
+        },
+        {
+            "indicator_name": "Recreation and culture",
+            "indicator_code": "PCPIR_PC_CP_A_PT"
+        },
+        {
+            "indicator_name": "Health",
+            "indicator_code": "PCPIM_PC_CP_A_PT"
+        },
+        {
+            "indicator_name": "Clothing and footwear",
+            "indicator_code": "PCPIA_PC_CP_A_PT"
+        },
+        {
+            "indicator_name": "Miscellaneous goods and services",
+            "indicator_code": "PCPIO_PC_CP_A_PT"
+        },
+        {
+            "indicator_name": "Transport",
+            "indicator_code": "PCPIT_PC_CP_A_PT"
+        }
+    ],
+    "texts": [
+        {
+            "name": "source",
+            "link": "https://ckan.africadatahub.org/dataset/inflation-data-for-africa",
+            "link_text": "IMF, Various national agencies, Africa Data Hub"
+        },
+        {
+            "name": "introductory_paragraph",
+            "title": "",
+            "text": "<p>The Africa Data Hub Consumer Price Indicator Explorer is created to help journalists, researchers and civil society organisations access up to date information about inflation indicators in their country and compare it with their neighbours. All numbers shown are percentage change, year-on-year, for the given indicator.</p>"
+        }
+    ]
+}
