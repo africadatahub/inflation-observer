@@ -12,6 +12,7 @@ import { CountrySelect } from '../components/CountrySelect';
 export class Home extends React.Component {
 
     render() {
+        var pymChild = new pym.Child({ id: 'home' });
         return (
             <div className="d-flex justify-content-center align-items-center">
                 <Container>

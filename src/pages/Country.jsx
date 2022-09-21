@@ -126,7 +126,7 @@ export class Country extends React.Component {
         let self = this;
 
        
-
+        var pymChild = new pym.Child({ id: 'country' });
         return (
             <div>
                 <Container>  
