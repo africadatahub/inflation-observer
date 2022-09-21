@@ -59,6 +59,7 @@ export class Country extends React.Component {
     }
 
     componentDidMount() {
+        pymChild.sendHeight();
         let self = this;
 
         let country = urlToLocation(window.location.pathname.replace('/',''));
@@ -127,7 +128,7 @@ export class Country extends React.Component {
        
 
         return (
-            <div style={{height: '1090px'}} >
+            <div>
                 <Container>  
                     <Card className='border-0 rounded mt-4'>
                         <Card.Body>
