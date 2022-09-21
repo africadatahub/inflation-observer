@@ -128,7 +128,7 @@ export class Country extends React.Component {
 
         return (
             <Container>  
-                <Card className={ window.innerWidth < 800 ? 'mt-5 border-0 rounded' : 'border-0 rounded' }>
+                <Card className='border-0 rounded mt-4'>
                     <Card.Body>
                         <Row className="gx-2 row-eq-height">
                             <Col xs="auto" className="align-self-center">
