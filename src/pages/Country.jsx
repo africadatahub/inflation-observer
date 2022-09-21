@@ -56,9 +56,6 @@ export class Country extends React.Component {
     }
 
     componentDidMount() {
-
-        let pymChild = new pym.Child();
-        pymChild.sendHeight();
         
         let self = this;
 

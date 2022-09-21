@@ -11,8 +11,7 @@ import { CountrySelect } from '../components/CountrySelect';
 export class Home extends React.Component {
 
     componentDidMount() {
-        let pymChild = new pym.Child();
-        pymChild.sendHeight();
+        
     }
 
     render() {
