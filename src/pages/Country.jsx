@@ -127,111 +127,111 @@ export class Country extends React.Component {
        
 
         return (
-            <Container>  
-                <Card className='border-0 rounded mt-4'>
-                    <Card.Body>
-                        <Row className="gx-2 row-eq-height">
-                            <Col xs="auto" className="align-self-center">
-                                <span className="fs-5">Select countries to visualise</span>
-                            </Col>
-                            <Col>
-                                <CountrySelect />
-                            </Col>
-                            <Col xs="auto" className="align-self-center">
-                                <span className="fs-5">Select an inflation indicator</span>
-                            </Col>
-                            <Col>
-                                <Form.Select className="border-0 me-1" style={{backgroundColor: '#F6F6F6', height: '100%'}} onChange={this.selectMetric}>
-                                    { settings.indicators.map((indicator, index) => 
-                                        <option key={indicator.indicator_code} value={indicator.indicator_code}>{indicator.indicator_name}</option>
-                                    ) }
-                                </Form.Select>
-                            </Col>
-                        </Row>
-                    </Card.Body>
-                </Card>
-
-                <Card className="border-0 rounded mt-4 py-4">
-                    <Card.Body>
-                        <Row>
-                            <Col className="text-center">
-                                <h3 className="mb-0 text-primary">Consumer price inflation rates in <mark>{this.state.selectedCountry != undefined ? this.state.selectedCountry.location : ''}</mark>:</h3>
-                                {self.state.selectedMetric != '' &&
-                                    <h4 className="mb-0 align-middle">{
-                                    _.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}).indicator_name
-                                    }</h4>
-                                }
-                                <p className="fs-5 mt-3 text-black-50">Numbers are percentage change, year on year</p>
-                            </Col>
-                        </Row>
-                        
-                        <hr/>
-                        
-                        <div style={{minHeight: '100px'}} className="position-relative">
-                            {this.state.loading && (
-                                <div className="position-absolute top-50 start-50 translate-middle text-center">
-                                    <Spinner animation="grow" />
-                                    <h3 className="mt-4">Loading</h3>
-                                </div>)
-                            }
-                            <>
-                                {this.state.data != undefined && (
-                                    <ResponsiveContainer width="100%" height={400}>
-                                        <ComposedChart data={this.state.data} margin={{top: 20, right: 0, bottom: 0, left: 0}}>
-                                            <XAxis dataKey="date" tickFormatter={ tick => moment(tick).format('MMM \'YY') }/>
-
-                                            <YAxis yAxisId="left" orientation="left" stroke="#99b3bb" domain={[_.minBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric]))),_.maxBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric])))]}/>
-                                            
-                                            <ReferenceLine y={0} yAxisId="left" stroke="red" strokeDasharray="3 3" />
-                                            
-                                            <CartesianGrid strokeDasharray="3 3"/>
-
-                                            <Tooltip content={<CustomTooltip/>} />
-                                            
-                                            {this.state.selectedMetric != '' && (<Line type="monotone" yAxisId="left" dot={false} dataKey={this.state.selectedMetric} strokeWidth={3} stroke="#089fd1" />)}
-
-                                            <Brush dataKey="date" height={30} stroke="#8eb4bf"  tickFormatter={ tick => moment(tick).format('MM/YY') }/>
-                                        </ComposedChart>
-                                    </ResponsiveContainer>)
-                                }
-                            </>
-                        </div>
-                        
-                        <hr/>
-                        
-                        { this.state.selectedMetric != '' ?
-                            <Row className="justify-content-between">
-                                <Col className="align-self-center">
-                                    <span className="text-black-50">Select a time period to show and download an image to share.</span>
+            <div style={{height: '1090px'}} >
+                <Container>  
+                    <Card className='border-0 rounded mt-4'>
+                        <Card.Body>
+                            <Row className="gx-2 row-eq-height">
+                                <Col xs="auto" className="align-self-center">
+                                    <span className="fs-5">Select countries to visualise</span>
                                 </Col>
-                                <Col xs={12} md="auto" className={window.innerWidth < 800 ? 'text-center my-3' : 'my-0'}>
-                                    <Button onClick={() => this.downloadChart()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} />&nbsp;Download Image</Button>
+                                <Col>
+                                    <CountrySelect />
                                 </Col>
-                                <Col md="auto" className="align-self-center">
-                                    <span className="text-black-50">Source: <a className="text-black-50" target="_blank" href={_.filter(settings.texts, function(def) { return def.name == 'source'})[0].link}>{_.filter(settings.texts, function(def) { return def.name == 'source'})[0].link_text}</a></span>
+                                <Col xs="auto" className="align-self-center">
+                                    <span className="fs-5">Select an inflation indicator</span>
+                                </Col>
+                                <Col>
+                                    <Form.Select className="border-0 me-1" style={{backgroundColor: '#F6F6F6', height: '100%'}} onChange={this.selectMetric}>
+                                        { settings.indicators.map((indicator, index) => 
+                                            <option key={indicator.indicator_code} value={indicator.indicator_code}>{indicator.indicator_name}</option>
+                                        ) }
+                                    </Form.Select>
                                 </Col>
                             </Row>
-                            : ''
-                        }
+                        </Card.Body>
+                    </Card>
 
-                        <hr/>
+                    <Card className="border-0 rounded mt-4 py-4">
+                        <Card.Body>
+                            <Row>
+                                <Col className="text-center">
+                                    <h3 className="mb-0 text-primary">Consumer price inflation rates in <mark>{this.state.selectedCountry != undefined ? this.state.selectedCountry.location : ''}</mark>:</h3>
+                                    {self.state.selectedMetric != '' &&
+                                        <h4 className="mb-0 align-middle">{
+                                        _.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}).indicator_name
+                                        }</h4>
+                                    }
+                                    <p className="fs-5 mt-3 text-black-50">Numbers are percentage change, year on year</p>
+                                </Col>
+                            </Row>
+                            
+                            <hr/>
+                            
+                            <div style={{minHeight: '100px'}} className="position-relative">
+                                {this.state.loading && (
+                                    <div className="position-absolute top-50 start-50 translate-middle text-center">
+                                        <Spinner animation="grow" />
+                                        <h3 className="mt-4">Loading</h3>
+                                    </div>)
+                                }
+                                <>
+                                    {this.state.data != undefined && (
+                                        <ResponsiveContainer width="100%" height={400}>
+                                            <ComposedChart data={this.state.data} margin={{top: 20, right: 0, bottom: 0, left: 0}}>
+                                                <XAxis dataKey="date" tickFormatter={ tick => moment(tick).format('MMM \'YY') }/>
 
-                        <Row className="justify-content-center m-5">
-                            <Col>
-                                <p className="fs-5">The Africa Data Hub Consumer Price Indicator Explorer is created to help journalists, researchers and civil society organisations access up to date information about inflation indicators in their country and compare it with their neighbours. All numbers shown are percentage change, year-on-year, for the given indicator.</p>
-                            </Col>
-                            <Col>
-                                <p className="text-black-50">Do you have a question about these numbers? Have you spotted a mistake or do they look different to the ones reported in your local press? See this page for more information about how this data is compiled.</p>
-                            </Col>
-                        </Row>
-                       
+                                                <YAxis yAxisId="left" orientation="left" stroke="#99b3bb" domain={[_.minBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric]))),_.maxBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric])))]}/>
+                                                
+                                                <ReferenceLine y={0} yAxisId="left" stroke="red" strokeDasharray="3 3" />
+                                                
+                                                <CartesianGrid strokeDasharray="3 3"/>
+
+                                                <Tooltip content={<CustomTooltip/>} />
+                                                
+                                                {this.state.selectedMetric != '' && (<Line type="monotone" yAxisId="left" dot={false} dataKey={this.state.selectedMetric} strokeWidth={3} stroke="#089fd1" />)}
+
+                                                <Brush dataKey="date" height={30} stroke="#8eb4bf"  tickFormatter={ tick => moment(tick).format('MM/YY') }/>
+                                            </ComposedChart>
+                                        </ResponsiveContainer>)
+                                    }
+                                </>
+                            </div>
+                            
+                            <hr/>
+                            
+                            { this.state.selectedMetric != '' ?
+                                <Row className="justify-content-between">
+                                    <Col className="align-self-center">
+                                        <span className="text-black-50">Select a time period to show and download an image to share.</span>
+                                    </Col>
+                                    <Col xs={12} md="auto" className={window.innerWidth < 800 ? 'text-center my-3' : 'my-0'}>
+                                        <Button onClick={() => this.downloadChart()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} />&nbsp;Download Image</Button>
+                                    </Col>
+                                    <Col md="auto" className="align-self-center">
+                                        <span className="text-black-50">Source: <a className="text-black-50" target="_blank" href={_.filter(settings.texts, function(def) { return def.name == 'source'})[0].link}>{_.filter(settings.texts, function(def) { return def.name == 'source'})[0].link_text}</a></span>
+                                    </Col>
+                                </Row>
+                                : ''
+                            }
+
+                            <hr/>
+
+                            <Row className="justify-content-center m-5">
+                                <Col>
+                                    <p className="fs-5">The Africa Data Hub Consumer Price Indicator Explorer is created to help journalists, researchers and civil society organisations access up to date information about inflation indicators in their country and compare it with their neighbours. All numbers shown are percentage change, year-on-year, for the given indicator.</p>
+                                </Col>
+                                <Col>
+                                    <p className="text-black-50">Do you have a question about these numbers? Have you spotted a mistake or do they look different to the ones reported in your local press? See this page for more information about how this data is compiled.</p>
+                                </Col>
+                            </Row>
                         
-                        
-                    </Card.Body>
-                </Card>
-
-
-            </Container>
+                            
+                            
+                        </Card.Body>
+                    </Card>
+                </Container>
+            </div>
         );
     }
 }

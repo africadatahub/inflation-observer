@@ -13,7 +13,7 @@ export class Home extends React.Component {
 
     render() {
         return (
-            <div className="min-vh-100 d-flex justify-content-center align-items-center">
+            <div style={{height: '400px'}} className="d-flex justify-content-center align-items-center">
                 <Container>
                     <Card> 
                         <Card.Body className="p-5">
