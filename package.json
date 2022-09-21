@@ -31,6 +31,7 @@
         "moment": "^2.29.1",
         "nouislider-react": "^3.4.0",
         "parcel": "^2.0.0-beta.2",
+        "pym-iframe-resizer": "^4.0.0",
         "react": "^17.0.2",
         "react-bootstrap": "^2.0.0-rc.0",
         "react-country-flag": "^2.3.1",

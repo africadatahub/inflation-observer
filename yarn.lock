@@ -6063,6 +6063,18 @@ purgecss@^2.3.0:
     postcss "7.0.32"
     postcss-selector-parser "^6.0.2"
 
+pym-iframe-resizer@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/pym-iframe-resizer/-/pym-iframe-resizer-4.0.0.tgz#36806c22c35b44459bf8d46bc22d0c1329154b67"
+  integrity sha512-1spsZezhGalimSwK2Fd8o1nttI0QJ/dIfIG6Xsu4VyGj9C36R+UBPqWJ8ALiHW++3TOmHf5noOkgURAfaeweIA==
+  dependencies:
+    pym.js "^0.4.5"
+
+pym.js@^0.4.5:
+  version "0.4.5"
+  resolved "https://registry.yarnpkg.com/pym.js/-/pym.js-0.4.5.tgz#7d52ac0c8cef8cbbe171dc0bb99bdf3790b937df"
+  integrity sha512-DePgDLkKzH031jz8ja3WoXVJZ69xDcHlCe1t3nzvklpOVGntSNDpgj9Egg25qThRxxzbhOaZElaF857WS5eRBQ==
+
 q@^1.1.2:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
