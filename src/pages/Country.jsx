@@ -178,7 +178,7 @@ export class Country extends React.Component {
                                 {this.state.data != undefined && (
                                     <ResponsiveContainer width="100%" height={400}>
                                         <ComposedChart data={this.state.data} margin={{top: 20, right: 0, bottom: 0, left: 0}}>
-                                            <XAxis dataKey="date" tickFormatter={ tick => moment(tick).format('MMM \'YY') } interval={11}/>
+                                            <XAxis dataKey="date" tickFormatter={ tick => moment(tick).format('MMM \'YY') }/>
 
                                             <YAxis yAxisId="left" orientation="left" stroke="#99b3bb" domain={[_.minBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric]))),_.maxBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric])))]}/>
                                             
