@@ -19,9 +19,8 @@ export class Home extends React.Component {
                         <Card.Body className="p-5">
                             <Row>
                                 <Col className="text-center">
-                                    <h1>Africa Inflation Observer</h1>
                                     <p className="fs-4">
-                                        Use the dropdown below to view a country's historic inflation data.
+                                        Use the dropdown menu to view CPI data for your country.
                                     </p>
                                     <CountrySelect />
                                 </Col>

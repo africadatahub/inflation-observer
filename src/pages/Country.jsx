@@ -113,7 +113,7 @@ export class Country extends React.Component {
             context.fillText('Africa Data Hub', canvas.width - 250, 30);
             context.drawImage(image, 0, 0, context.canvas.width-10, context.canvas.height-10);
             let jpeg = canvas.toDataURL('image/jpeg', 1.0);
-            saveAs(jpeg, self.state.selectedCountry + '--' + _.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}).indicator_name);
+            saveAs(jpeg, self.state.selectedCountry.location.replace(' ', '-') + '--' + _.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}).indicator_name);
         };
 
         image.src = blobURL;
@@ -130,8 +130,14 @@ export class Country extends React.Component {
                 <Card className={ window.innerWidth < 800 ? 'mt-5 border-0 rounded' : 'border-0 rounded' }>
                     <Card.Body>
                         <Row className="gx-2 row-eq-height">
+                            <Col xs="auto" className="align-self-center">
+                                <span className="fs-5">Select countries to visualise</span>
+                            </Col>
                             <Col>
                                 <CountrySelect />
+                            </Col>
+                            <Col xs="auto" className="align-self-center">
+                                <span className="fs-5">Select an inflation indicator</span>
                             </Col>
                             <Col>
                                 <Form.Select className="border-0 me-1" style={{backgroundColor: '#F6F6F6', height: '100%'}} onChange={this.selectMetric}>
@@ -148,12 +154,13 @@ export class Country extends React.Component {
                     <Card.Body>
                         <Row>
                             <Col className="text-center">
-                                <h3 className="mb-0 text-primary">Monthly inflation rates in <mark>{this.state.selectedCountry != undefined ? this.state.selectedCountry.location : ''}</mark>:</h3>
+                                <h3 className="mb-0 text-primary">Consumer price inflation rates in <mark>{this.state.selectedCountry != undefined ? this.state.selectedCountry.location : ''}</mark>:</h3>
                                 {self.state.selectedMetric != '' &&
                                     <h4 className="mb-0 align-middle">{
                                     _.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}).indicator_name
                                     }</h4>
                                 }
+                                <p className="fs-5 mt-3 text-black-50">Numbers are percentage change, year on year</p>
                             </Col>
                         </Row>
                         
@@ -186,20 +193,34 @@ export class Country extends React.Component {
                                     </ResponsiveContainer>)
                                 }
                             </>
-                            </div>
+                        </div>
+                        
                         <hr/>
                         
                         { this.state.selectedMetric != '' ?
                             <Row className="justify-content-between">
-                                <Col xs={12} md="auto" className={window.innerWidth < 800 ? 'text-center my-3' : 'my-0'}>
-                                
-                                <Button onClick={() => this.downloadChart()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} />&nbsp;Download Image</Button>
-                                
+                                <Col className="align-self-center">
+                                    <span className="text-black-50">Select a time period to show and download an image to share.</span>
                                 </Col>
-                                <Col md="auto"><span className="text-black-50 align-middle">Source: <a className="text-black-50" target="_blank" href={_.filter(settings.texts, function(def) { return def.name == 'source'})[0].link}>{_.filter(settings.texts, function(def) { return def.name == 'source'})[0].link_text}</a></span></Col>
+                                <Col xs={12} md="auto" className={window.innerWidth < 800 ? 'text-center my-3' : 'my-0'}>
+                                    <Button onClick={() => this.downloadChart()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} />&nbsp;Download Image</Button>
+                                </Col>
+                                <Col md="auto" className="align-self-center">
+                                    <span className="text-black-50">Source: <a className="text-black-50" target="_blank" href={_.filter(settings.texts, function(def) { return def.name == 'source'})[0].link}>{_.filter(settings.texts, function(def) { return def.name == 'source'})[0].link_text}</a></span>
+                                </Col>
                             </Row>
                             : ''
                         }
+
+                        <hr/>
+
+                        <Row className="justify-content-center my-4">
+                            <Col lg={6}>
+                                <p className="fs-5">The Africa Data Hub Consumer Price Indicator Explorer is created to help journalists, researchers and civil society organisations access up to date information about inflation indicators in their country and compare it with their neighbours. All numbers shown are percentage change, year-on-year, for the given indicator.</p>
+                                <hr/>
+                                <p className="text-black-50">Do you have a question about these numbers? Have you spotted a mistake or do they look different to the ones reported in your local press? See this page for more information about how this data is compiled.</p>
+                            </Col>
+                        </Row>
                        
                         
                         

@@ -13,7 +13,7 @@ import { locationToUrl, urlToLocation } from '../utils/func.js';
 export class CountrySelect extends React.Component {
 
     isCountryPage = () => {
-        return window.location.pathname == null || window.location.pathname == '/' ? 'Select a Country' : <>
+        return window.location.pathname == null || window.location.pathname == '/' ? 'Select your country' : <>
             <div style={{width: '1.5em', height: '1.5em', borderRadius: '50%', overflow: 'hidden', position: 'relative', display: 'inline-block', top: '0.2em', marginRight: '0.4em'}} className="border">
                 <ReactCountryFlag
                 svg
