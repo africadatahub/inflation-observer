@@ -8,12 +8,14 @@ import Card from 'react-bootstrap/Card';
 
 import { CountrySelect } from '../components/CountrySelect';
 
-import pym from 'pym.js';
-
 export class Home extends React.Component {
 
+    componentDidMount() {
+        let pymChild = new pym.Child();
+        pymChild.sendHeight();
+    }
+
     render() {
-        var pymChild = new pym.Child({ id: 'home' });
         return (
             <div className="d-flex justify-content-center align-items-center">
                 <Container>
