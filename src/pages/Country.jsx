@@ -59,7 +59,7 @@ export class Country extends React.Component {
     }
 
     componentDidMount() {
-        pymChild.sendHeight();
+        
         let self = this;
 
         let country = urlToLocation(window.location.pathname.replace('/',''));

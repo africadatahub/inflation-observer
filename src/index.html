@@ -53,6 +53,12 @@
         var pymChild = new pym.Child({
             polling: 1000
         });
+
+        setInterval(function() {
+            pymChild.sendHeight();
+        }, 2000);
+
+        
     </script>
 
 
