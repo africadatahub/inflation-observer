@@ -50,9 +50,7 @@
 
     <script type="text/javascript" src="https://pym.nprapps.org/pym.v1.min.js"></script>
     <script>
-        var pymChild = new pym.Child({
-            polling: 1000
-        });
+        var pymChild = new pym.Child();
 
         setInterval(function() {
             pymChild.sendHeight();
