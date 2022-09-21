@@ -25,6 +25,7 @@ import { faArrowLeft, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 
 import * as settings from '../data/settings.json';
 import { locationToUrl, urlToLocation } from '../utils/func.js';
+import { Collapse } from 'react-bootstrap';
 
 
 
@@ -215,9 +216,10 @@ export class Country extends React.Component {
                         <hr/>
 
                         <Row className="justify-content-center my-4">
-                            <Col lg={6}>
+                            <Col>
                                 <p className="fs-5">The Africa Data Hub Consumer Price Indicator Explorer is created to help journalists, researchers and civil society organisations access up to date information about inflation indicators in their country and compare it with their neighbours. All numbers shown are percentage change, year-on-year, for the given indicator.</p>
-                                <hr/>
+                            </Col>
+                            <Col>
                                 <p className="text-black-50">Do you have a question about these numbers? Have you spotted a mistake or do they look different to the ones reported in your local press? See this page for more information about how this data is compiled.</p>
                             </Col>
                         </Row>
