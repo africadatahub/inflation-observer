@@ -215,7 +215,7 @@ export class Country extends React.Component {
 
                         <hr/>
 
-                        <Row className="justify-content-center my-4">
+                        <Row className="justify-content-center m-5">
                             <Col>
                                 <p className="fs-5">The Africa Data Hub Consumer Price Indicator Explorer is created to help journalists, researchers and civil society organisations access up to date information about inflation indicators in their country and compare it with their neighbours. All numbers shown are percentage change, year-on-year, for the given indicator.</p>
                             </Col>
