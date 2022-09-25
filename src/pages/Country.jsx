@@ -181,7 +181,7 @@ export class Country extends React.Component {
 
                                                 <YAxis yAxisId="left" orientation="left" stroke="#99b3bb" domain={[_.minBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric]))),_.maxBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric])))]}/>
                                                 
-                                                <ReferenceLine y={0} yAxisId="left" stroke="red" strokeDasharray="3 3" />
+                                                <ReferenceLine y={0} yAxisId="left" stroke="red" label="0%" strokeDasharray="3 3" />
                                                 
                                                 <CartesianGrid strokeDasharray="3 3"/>
 
@@ -217,10 +217,10 @@ export class Country extends React.Component {
 
                             <Row className="justify-content-center m-5">
                                 <Col>
-                                    <p className="fs-5">The Africa Data Hub Consumer Price Indicator Explorer is created to help journalists, researchers and civil society organisations access up to date information about inflation indicators in their country and compare it with their neighbours. All numbers shown are percentage change, year-on-year, for the given indicator.</p>
+                                    <p className="fs-5">The Africa Data Hub Inflation Observer is created to help journalists, researchers and civil society organisations access up to date information about inflation indicators in their country and compare it with their neighbours. </p>
                                 </Col>
                                 <Col>
-                                    <p className="text-black-50">Do you have a question about these numbers? Have you spotted a mistake or do they look different to the ones reported in your local press? See this page for more information about how this data is compiled.</p>
+                                    <p className="text-black-50">Do you have a question about these numbers? Have you spotted a mistake or do they look different to the ones reported in your local press (especially in South Africa)? See <a href="https://africadatahub.org/data-resources/inflation-observer#w-tabs-0-data-w-pane-1" target="_parent">this page</a> for more information about how this data is compiled. </p>
                                 </Col>
                             </Row>
                         
