@@ -220,7 +220,7 @@ export class Country extends React.Component {
                                     <p className="fs-5">The Africa Data Hub Inflation Observer is created to help journalists, researchers and civil society organisations access up to date information about inflation indicators in their country and compare it with their neighbours. </p>
                                 </Col>
                                 <Col>
-                                    <p className="text-black-50">Do you have a question about these numbers? Have you spotted a mistake or do they look different to the ones reported in your local press (especially in South Africa)? See <a href="https://africadatahub.org/data-resources/inflation-observer#w-tabs-0-data-w-pane-1" target="_parent">this page</a> for more information about how this data is compiled. </p>
+                                    <p className="text-black-50">Do you have a question about these numbers? Have you spotted a mistake or do they look different to the ones reported in your local press (especially in South Africa)? See <a href="https://africadatahub.org/data-resources/inflation-observer#about" target="_parent">this page</a> for more information about how this data is compiled. </p>
                                 </Col>
                             </Row>
                         
