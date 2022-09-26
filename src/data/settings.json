@@ -51,12 +51,28 @@
         {
             "indicator_name": "Transport",
             "indicator_code": "PCPIT_PC_CP_A_PT"
+        },
+        {
+            "indicator_name": "Communication",
+            "indicator_code": "PCPIEC_PC_CP_A_PT"
+        },
+        {
+            "indicator_name": "Education",
+            "indicator_code": "PCPIED_PC_CP_A_PT"
+        },
+        {
+            "indicator_name": "Alcoholic beverages and tobacco",
+            "indicator_code": "PCPIB_PC_CP_A_PT"
+        },
+        {
+            "indicator_name": "Restaurants and hotels",
+            "indicator_code": "PCPIE_PC_CP_A_PT"
         }
     ],
     "texts": [
         {
             "name": "source",
-            "link": "https://ckan.africadatahub.org/dataset/inflation-data-for-africa",
+            "link": "https://ckan.africadatahub.org/dataset/inflation-data-for-africa/resource/15b5b9eb-e68e-461c-8f8e-7bd0c69dcd14",
             "link_text": "IMF, Various national agencies, Africa Data Hub"
         },
         {
