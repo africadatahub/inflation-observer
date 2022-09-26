@@ -62,11 +62,11 @@
         },
         {
             "indicator_name": "Alcoholic beverages and tobacco",
-            "indicator_code": "PCPIB_PC_CP_A_PT"
+            "indicator_code": "PCPIFBT_PC_CP_A_PT"
         },
         {
             "indicator_name": "Restaurants and hotels",
-            "indicator_code": "PCPIE_PC_CP_A_PT"
+            "indicator_code": "PCPIRE_PC_CP_A_PT"
         }
     ],
     "texts": [
