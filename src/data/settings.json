@@ -72,7 +72,8 @@
     "texts": [
         {
             "name": "source",
-            "link": "https://ckan.africadatahub.org/dataset/inflation-data-for-africa/resource/15b5b9eb-e68e-461c-8f8e-7bd0c69dcd14",
+            // "link": "https://ckan.africadatahub.org/dataset/inflation-data-for-africa/resource/15b5b9eb-e68e-461c-8f8e-7bd0c69dcd14",
+            "link": "https://ckan.africadatahub.org/dataset/imf-africa-inflation-database/resource/626c5497-a3d2-461f-9f51-8485d94e36b3",
             "link_text": "IMF, Various national agencies, Africa Data Hub"
         },
         {
