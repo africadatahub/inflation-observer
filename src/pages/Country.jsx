@@ -119,6 +119,14 @@ export class Country extends React.Component {
 
     }
 
+    downloadData = () => {
+        let csv = 'date,' + _.find(settings.indicators, indicator => { return indicator.indicator_code == this.state.selectedMetric }).indicator_name + ' \r';
+        this.state.data.forEach(record => {
+            csv += moment(record.date).format('MM-YYYY') + ',' + record[this.state.selectedMetric] + ' \r';
+        });
+        saveAs(new Blob([csv], {type: "text/csv;charset=utf-8"}), this.state.selectedCountry.location.replace(' ', '-') + '--' + _.find(settings.indicators, indicator => { return indicator.indicator_code == this.state.selectedMetric}).indicator_name + '.csv');
+    }    
+
     render() {
         let self = this;
 
@@ -202,6 +210,9 @@ export class Country extends React.Component {
                                 <Row className="justify-content-between">
                                     <Col className="align-self-center">
                                         <span className="text-black-50">Select a time period to show and download an image to share.</span>
+                                    </Col>
+                                    <Col xs={12} md="auto" className={window.innerWidth < 800 ? 'text-center my-3' : 'my-0'}>
+                                        <Button onClick={() => this.downloadData()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} />&nbsp;Download Data</Button>
                                     </Col>
                                     <Col xs={12} md="auto" className={window.innerWidth < 800 ? 'text-center my-3' : 'my-0'}>
                                         <Button onClick={() => this.downloadChart()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} />&nbsp;Download Image</Button>
