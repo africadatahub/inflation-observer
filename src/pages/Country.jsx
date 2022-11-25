@@ -120,7 +120,7 @@ export class Country extends React.Component {
     }
 
     downloadData = () => {
-        let csv = 'date,' + _.find(settings.indicators, indicator => { return indicator.indicator_code == this.state.selectedMetric }).indicator_name + ' \r';
+        let csv = 'date,' + _.find(settings.indicators, indicator => { return indicator.indicator_code == this.state.selectedMetric }).indicator_name.replace(' ','-').replace(',','-') + ' \r';
         this.state.data.forEach(record => {
             csv += moment(record.date).format('MM-YYYY') + ',' + record[this.state.selectedMetric] + ' \r';
         });
