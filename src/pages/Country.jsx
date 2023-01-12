@@ -61,26 +61,31 @@ export class Country extends React.Component {
 
         let country = urlToLocation(window.location.pathname.replace('/',''));
 
-        axios.get(settings.api.url + 'action/datastore_search_sql?sql=SELECT%20*%20from%20"' + settings.api.countryData + '"%20WHERE%20iso_code%20LIKE%20%27' + country.iso_code + '%27',
-            { headers: {
-                "Authorization": process.env.CKAN
-            }
-        })
-        .then(function(response) {
-            
-            let records = _.sortBy(response.data.result.records, ['date']);
 
-            self.setState({
-                selectedCountry: country,
-                selectedCountryIso2: getCountryISO2(country.iso_code),
-                selectedMetric: settings.countryChart.selectedBaseMetric,
-                data: records,
-                loading: false
-            });
-        })
+        if(country != undefined) {
+
+            axios.get(settings.api.url + 'action/datastore_search_sql?sql=SELECT%20*%20from%20"' + settings.api.countryData + '"%20WHERE%20iso_code%20LIKE%20%27' + country.iso_code + '%27',
+                { headers: {
+                    "Authorization": process.env.CKAN
+                }
+            })
+            .then(function(response) {
+                
+                let records = _.sortBy(response.data.result.records, ['date']);
+
+                self.setState({
+                    selectedCountry: country,
+                    selectedCountryIso2: getCountryISO2(country.iso_code),
+                    selectedMetric: settings.countryChart.selectedBaseMetric,
+                    data: records,
+                    loading: false
+                });
+            })
+
+        }
     }
 
-    
+
    
 
     selectMetric = (e) => {
