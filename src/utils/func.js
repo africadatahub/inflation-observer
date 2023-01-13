@@ -11,7 +11,9 @@ export const urlToLocation = (url) => {
         url = "cote-d'ivoire";
     }
 
-    let location = _.find(countriesList, (country) => country.location.toLowerCase() === url.replace('-',' ') );
+    
+
+    let location = _.find(countriesList, (country) => country.location.toLowerCase() === url.replaceAll('-',' ') );
 
     if(url == 'guinea-bissau') {
         location = _.find(countriesList, (country) => country.location.toLowerCase() === url );
