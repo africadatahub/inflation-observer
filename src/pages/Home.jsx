@@ -16,7 +16,7 @@ export class Home extends React.Component {
 
     render() {
         return (
-            <div className="d-flex justify-content-center align-items-center mt-4">
+            <div className="d-flex justify-content-center align-items-center mt-4" style={{minHeight: '300px'}}>
                 <Container>
                     <Card> 
                         <Card.Body className="p-5">
