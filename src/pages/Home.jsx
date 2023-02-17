@@ -17,22 +17,7 @@ export class Home extends React.Component {
     render() {
         return (
             <div className="d-flex justify-content-center align-items-center mt-4">
-                <Container>
-                    <Card> 
-                        <Card.Body className="p-5">
-                            <Row>
-                                <Col className="text-center" style={{minHeight: '300px'}}>
-                                    <p className="fs-4">
-                                        Use the dropdown menu to view CPI data for your country.
-                                    </p>
-                                    <CountrySelect />
-                                </Col>
-                            </Row>
-
-                           
-                        </Card.Body>
-                    </Card>
-                </Container>
+                
             </div>
         );
     }
