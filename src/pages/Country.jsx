@@ -143,12 +143,12 @@ export class Country extends React.Component {
                     <Card className='border-0 rounded mt-4'>
                         <Card.Body>
                             <Row className="gx-2 row-eq-height">
-                                <Col xs="auto" className="align-self-center">
+                                {/* <Col xs="auto" className="align-self-center">
                                     <span className="fs-5">Select countries to visualise</span>
                                 </Col>
                                 <Col>
                                     <CountrySelect />
-                                </Col>
+                                </Col> */}
                                 <Col xs="auto" className="align-self-center">
                                     <span className="fs-5">Select an inflation indicator</span>
                                 </Col>
