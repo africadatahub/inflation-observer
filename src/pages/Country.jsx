@@ -239,11 +239,22 @@ export class Country extends React.Component {
                                     <p className="text-black-50">Do you have a question about these numbers? Have you spotted a mistake or do they look different to the ones reported in your local press (especially in South Africa)? See <a href="https://africadatahub.org/data-resources/inflation-observer#about" target="_parent">this page</a> for more information about how this data is compiled. </p>
                                 </Col>
                             </Row>
-                        
-                            
                             
                         </Card.Body>
                     </Card>
+
+                    
+                    <Card className="border-0 rounded mt-4">
+                        <Card.Body>
+                            <Row className="align-items-end">
+                                <Col></Col>
+                                <Col xs="auto">
+                                    <div style={{display: 'inline-block', position: 'relative', top: '0.2em', right: '0.6em'}}>POWERED BY</div> <a target="_blank" href="https://www.openup.org.za"><img style={{width: '100px'}} src="https://brand-assets.openup.org.za/openup/PNG/Standard/openup-logo-1200x267.png"/></a>
+                                </Col>
+                            </Row>
+                        </Card.Body>
+                    </Card>
+                        
                 </Container>
             </div>
         );
