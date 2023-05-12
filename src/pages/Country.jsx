@@ -118,11 +118,11 @@ export class Country extends React.Component {
 
             document.querySelector('meta[property="og:title"]').setAttribute("content", `${this.state.selectedCountry.location} Inflation Observer | Africa Data Hub`);
 
-            document.querySelector('meta[property="og:description"]').setAttribute("content", `Consumer price inflation in ${country_name}, 2008 to the present, including COICOP indicators`);
+            document.querySelector('meta[property="og:description"]').setAttribute("content", `Consumer price inflation in ${this.state.selectedCountry.location}, 2008 to the present, including COICOP indicators`);
 
             document.querySelector('meta[property="twitter:title"]').setAttribute("content", `${this.state.selectedCountry.location} Inflation Observer | Africa Data Hub`);
 
-            document.querySelector('meta[property="twitter:description"]').setAttribute("content", `Consumer price inflation in ${country_name}, 2008 to the present, including COICOP indicators`);
+            document.querySelector('meta[property="twitter:description"]').setAttribute("content", `Consumer price inflation in ${this.state.selectedCountry.location}, 2008 to the present, including COICOP indicators`);
 
             document.querySelector('meta[property="og:type"]').setAttribute("content", `website`);
 
