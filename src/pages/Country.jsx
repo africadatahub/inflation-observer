@@ -268,7 +268,7 @@ export class Country extends React.Component {
                                     
                                     { this.state.selectedCountry != undefined &&
                                     <>
-                                    <p className="mt-3 fs-5 text-black-60"><strong>{this.state.selectedCountry.location}</strong>'s consumer price inflation (CPI) rate for the full year <strong>{this.state.selectedCountry.annual_rates.last_full_year}</strong> was <strong>{Math.round(this.state.selectedCountry.annual_rates[this.state.selectedCountry.annual_rates.last_full_year] * 100) / 100}%</strong>.</p>{this.state.selectedCountry.annual_rates.extra_notes != '' ? <p className="mt-3 fs-5 text-black-60">{this.state.selectedCountry.annual_rates.extra_notes}</p> : ''}
+                                    <p className="mt-3 fs-5 text-black-60"><strong>{this.state.selectedCountry.location}</strong>'s consumer price inflation (CPI) rate for the full year <strong>{this.state.selectedCountry.annual_rates.last_full_year}</strong> was <strong>{Math.round(this.state.selectedCountry.annual_rates[this.state.selectedCountry.annual_rates.last_full_year] * 100) / 100}%</strong>.</p>{this.state.selectedCountry.annual_rates.Extra_notes != '' ? <p className="mt-3 fs-5 text-black-60">{this.state.selectedCountry.annual_rates.Extra_notes}</p> : ''}
                                     </>
                                     }
                                     <p className="fs-5 mt-3 text-black-50">Numbers are percentage change, year on year</p>
