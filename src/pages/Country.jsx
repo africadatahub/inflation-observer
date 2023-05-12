@@ -27,6 +27,8 @@ import * as settings from '../data/settings.json';
 import { locationToUrl, urlToLocation } from '../utils/func.js';
 import { Collapse } from 'react-bootstrap';
 
+import * as annualRates from '../data/annual-rates.json';
+
 const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
         return (
@@ -59,7 +61,12 @@ export class Country extends React.Component {
         
         let self = this;
 
-        let country = urlToLocation(window.location.pathname.replace('/',''));
+        let searchTerms = document.location.search.split('&');
+
+        let countrySearch = searchTerms.filter(term => term.includes('country='))[0];
+
+        let country = urlToLocation(countrySearch.split('=')[1]);
+
 
 
         if(country != undefined) {
@@ -73,16 +80,101 @@ export class Country extends React.Component {
                 
                 let records = _.sortBy(response.data.result.records, ['date']);
 
+                country.annual_rates = annualRates.find(cntry => cntry.country_code == country.iso_code);
+                country.url = locationToUrl(country.location);
+
                 self.setState({
                     selectedCountry: country,
                     selectedCountryIso2: getCountryISO2(country.iso_code),
                     selectedMetric: settings.countryChart.selectedBaseMetric,
                     data: records,
                     loading: false
+                }, () => {
+                    self.addMetadata();
                 });
+
+
+
+
+
+
+                
             })
 
         }
+    }
+
+
+    addMetadata = () => {
+
+        let page_title = document.querySelector('h1.hero-title');
+
+        if(page_title != null) {
+
+            page_title.innerHTML = `${this.state.selectedCountry.location} Inflation Observer`;
+            document.title = `${this.state.selectedCountry.location} Inflation Observer | Africa Data Hub`;
+
+            document.querySelector('meta[name="description"]').setAttribute("content", `Consumer price inflation in ${this.state.selectedCountry.location}, 2008 to the present, including COICOP indicators`);
+
+            document.querySelector('meta[property="og:title"]').setAttribute("content", `${this.state.selectedCountry.location} Inflation Observer | Africa Data Hub`);
+
+            document.querySelector('meta[property="og:description"]').setAttribute("content", `Consumer price inflation in ${country_name}, 2008 to the present, including COICOP indicators`);
+
+            document.querySelector('meta[property="twitter:title"]').setAttribute("content", `${this.state.selectedCountry.location} Inflation Observer | Africa Data Hub`);
+
+            document.querySelector('meta[property="twitter:description"]').setAttribute("content", `Consumer price inflation in ${country_name}, 2008 to the present, including COICOP indicators`);
+
+            document.querySelector('meta[property="og:type"]').setAttribute("content", `website`);
+
+            document.getElementById("countrySelect").value = this.state.selectedCountry.location;
+
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.innerHTML = `{
+            "@context":"https://schema.org/",
+            "@type":"Dataset",
+            "name":"${this.state.selectedCountry.location} Consumer price inflation, 2008-present",
+            "description":"Consumer price inflation in ${this.state.selectedCountry.location}, 2008 to the present, including COICOP indicators",
+            "url":"https://www.africadatahub.org/data-resources/inflation-observer?country=${this.state.selectedCountry.url}",
+            "isPartOF":"https://www.africadatahub.org/data-resources/inflation-observer",
+            "keywords":[
+                "CONSUMER PRICE INFLATION > MONTHLY CHANGE, ANNUAL %", 
+                "CONSUMER PRICE INFLATION > COICOP INDICATORS",
+                "CONSUMER PRICE INFLATION > AFRICA > {COUNTRY}"
+            ],
+            "isAccessibleForFree" : true,
+            "creator":{
+                "@type":"Organization",
+                "url": "https://www.africadatahub.org",
+                "name":"Africa Data Hub",
+                "contactPoint":{
+                    "@type":"ContactPoint",
+                    "contactType": "enquiries",
+                    "email":"info@africadatahub.org"
+                }
+            },
+            "funder":{
+                "@type": "Organization",
+                "sameAs": "https://www.gatesfoundation.org/",
+                "name": "Bill & Melinda Gates Foundation"
+            },
+            "includedInDataCatalog":{
+                "@type":"DataCatalog",
+                "name":"https://ckan.africadatahub.org/"
+            },
+            "distribution":[
+                {
+                    "@type":"DataDownload",
+                    "encodingFormat":"CSV",
+                    "contentUrl":"https://ckan.africadatahub.org/datastore/dump/626c5497-a3d2-461f-9f51-8485d94e36b3?bom=True"
+                }
+            ]
+        }`;
+
+        document.head.appendChild(script);
+    
+    }
+    
     }
 
 
@@ -143,12 +235,12 @@ export class Country extends React.Component {
                     <Card className='border-0 rounded mt-4'>
                         <Card.Body>
                             <Row className="gx-2 row-eq-height">
-                                {/* <Col xs="auto" className="align-self-center">
+                                <Col xs="auto" className="align-self-center">
                                     <span className="fs-5">Select countries to visualise</span>
                                 </Col>
                                 <Col>
                                     <CountrySelect />
-                                </Col> */}
+                                </Col>
                                 <Col xs="auto" className="align-self-center">
                                     <span className="fs-5">Select an inflation indicator</span>
                                 </Col>
@@ -172,6 +264,12 @@ export class Country extends React.Component {
                                         <h4 className="mb-0 align-middle">{
                                         _.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}).indicator_name
                                         }</h4>
+                                    }
+                                    
+                                    { this.state.selectedCountry != undefined &&
+                                    <>
+                                    <p className="mt-3 fs-5 text-black-60"><strong>{this.state.selectedCountry.location}</strong>'s consumer price inflation (CPI) rate for the full year <strong>{this.state.selectedCountry.annual_rates.last_full_year}</strong> was <strong>{Math.round(this.state.selectedCountry.annual_rates[this.state.selectedCountry.annual_rates.last_full_year] * 100) / 100}%</strong>.</p>{this.state.selectedCountry.annual_rates.extra_notes ? <p className="mt-3 fs-5 text-black-60">this.state.selectedCountry.annual_rates.extra_notes</p> : ''}
+                                    </>
                                     }
                                     <p className="fs-5 mt-3 text-black-50">Numbers are percentage change, year on year</p>
                                 </Col>
@@ -217,10 +315,10 @@ export class Country extends React.Component {
                                         <span className="text-black-50">Select a time period to show and download an image to share.</span>
                                     </Col>
                                     <Col xs={12} md="auto" className={window.innerWidth < 800 ? 'text-center my-3' : 'my-0'}>
-                                        <Button onClick={() => this.downloadData()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} />&nbsp;Download Data</Button>
+                                        <Button onClick={() => this.downloadData()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} />Download Data</Button>
                                     </Col>
                                     <Col xs={12} md="auto" className={window.innerWidth < 800 ? 'text-center my-3' : 'my-0'}>
-                                        <Button onClick={() => this.downloadChart()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} />&nbsp;Download Image</Button>
+                                        <Button onClick={() => this.downloadChart()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} />Download Image</Button>
                                     </Col>
                                     <Col md="auto" className="align-self-center">
                                         <span className="text-black-50">Source: <a className="text-black-50" target="_blank" href={_.filter(settings.texts, function(def) { return def.name == 'source'})[0].link}>{_.filter(settings.texts, function(def) { return def.name == 'source'})[0].link_text}</a></span>
