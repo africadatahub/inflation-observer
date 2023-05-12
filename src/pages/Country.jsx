@@ -126,7 +126,7 @@ export class Country extends React.Component {
 
             document.querySelector('meta[property="og:type"]').setAttribute("content", `website`);
 
-            document.getElementById("countrySelect").value = this.state.selectedCountry.location;
+            // document.getElementById("countrySelect").value = this.state.selectedCountry.location;
 
             const script = document.createElement('script');
             script.type = 'application/ld+json';
