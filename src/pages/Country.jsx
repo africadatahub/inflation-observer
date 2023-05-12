@@ -231,8 +231,8 @@ export class Country extends React.Component {
         
         return (
             <div>
-                <Container>  
-                    <Card className='border-0 rounded mt-4'>
+                <Container className="py-4">  
+                    <Card className='border-0 rounded'>
                         <Card.Body>
                             <Row className="gx-2 row-eq-height">
                                 <Col xs="auto" className="align-self-center">
