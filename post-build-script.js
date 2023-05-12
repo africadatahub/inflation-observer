@@ -207,7 +207,7 @@ const jsFile = fs.readFileSync(jsFiles[0], 'utf8');
 
 // Add the random class to the 'app' element
 // Probably don't need all the wrappers. Just add randomClass to app
-const updatedJs = jsFile.replace('".app"', `"${randomClass}"`);
+const updatedJs = jsFile.replace('".app"', `".${randomClass}"`);
 
 // Write the modified HTML back to the file
 fs.writeFileSync(jsFiles[0], updatedJs);
