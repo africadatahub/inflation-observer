@@ -193,27 +193,3 @@ const updatedHtml = htmlFile.replace('<div class="app"></div>', `<div class="${r
 // Write the modified HTML back to the file
 fs.writeFileSync(htmlFiles[0], updatedHtml);
 console.log(`Added class '${randomClass}' to the 'app' element in '${htmlFiles[0]}'`);
-
-
-// Find the name of the js file
-const jsFiles = glob.sync('dist/*.js');
-if (jsFiles.length === 0) {
-    console.error('Could not find generated JS file');
-    process.exit(1);
-}
-
-// Read the js file
-const jsFile = fs.readFileSync(jsFiles[0], 'utf8');
-
-// Add the random class to the 'app' element
-// Probably don't need all the wrappers. Just add randomClass to app
-const updatedJs = jsFile.replace('".app"', `".${randomClass}"`);
-
-// Write the modified HTML back to the file
-fs.writeFileSync(jsFiles[0], updatedJs);
-console.log(`Added class '${randomClass}' to the 'app' element in '${jsFiles[0]}'`);
-
-
-
-// TODO: Rename files?
-
