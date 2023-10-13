@@ -12,7 +12,7 @@ import { locationToUrl, urlToLocation } from './utils/func.js';
 function App() {
   return (
     <div>
-        <Header />
+        {/* <Header /> */}
         <BrowserRouter>
             <Routes>
               <Route path="/" element={<Home />} />
