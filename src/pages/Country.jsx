@@ -12,7 +12,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
 
-import { ResponsiveContainer, ComposedChart, Bar, Brush, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine } from 'recharts';
+import { ResponsiveContainer, ComposedChart, Bar, Brush, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, Label } from 'recharts';
 import { saveAs } from 'file-saver';
 
 import { CountrySelect } from '../components/CountrySelect';
@@ -26,6 +26,10 @@ import { faArrowLeft, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import * as settings from '../data/settings.json';
 import { locationToUrl, urlToLocation } from '../utils/func.js';
 import { Collapse } from 'react-bootstrap';
+import SocialMedia from '../components/SocialMedia';
+
+import adhLogo from '../adh-logo.png'
+
 
 import * as annualRates from '../data/annual-rates.json';
 
@@ -196,18 +200,34 @@ export class Country extends React.Component {
         let URL = window.URL || window.webkitURL || window;
         let blobURL = URL.createObjectURL(svgBlob);
 
+        
+
         let image = new Image();
+        image.crossOrigin = "Anonymous"; 
         image.onload = () => {
             let canvas = document.createElement('canvas');
             canvas.width = width+10;
-            canvas.height = height+10;
+            canvas.height = height+100;
             let context = canvas.getContext('2d');
             context.fillStyle = 'rgba(255,255,255,1)';
             context.fillRect(0,0,canvas.width,canvas.height);
-            context.fillStyle = 'rgba(0,0,0,0.3)';
-            context.font = 'bold 24px Arial';
-            context.fillText('Africa Data Hub', canvas.width - 250, 30);
-            context.drawImage(image, 0, 0, context.canvas.width-10, context.canvas.height-10);
+            context.fillStyle = '#094151';
+
+            //Draw Title and Logo
+
+            //Title
+            var selectedIndicator = _.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}).indicator_name
+            var text = `Consumer price inflation rates in ${this.state.selectedCountry != undefined ? this.state.selectedCountry.location : ''}` + ` : ${selectedIndicator}`
+            context.font = '600 25px Work Sans';
+            context.fillText(text, 30, 40);
+
+            //Logo
+            var logo = document.getElementById('logo')
+            
+            context.drawImage(logo, context.canvas.width-logo.width-30, 10);
+
+
+            context.drawImage(image, 0, 100, context.canvas.width-10, context.canvas.height-100);
             let jpeg = canvas.toDataURL('image/jpeg', 1.0);
             saveAs(jpeg, self.state.selectedCountry.location.replace(' ', '-') + '--' + _.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}).indicator_name);
         };
@@ -290,7 +310,11 @@ export class Country extends React.Component {
                                             <ComposedChart data={this.state.data} margin={{top: 20, right: 0, bottom: 0, left: 0}}>
                                                 <XAxis dataKey="date" tickFormatter={ tick => moment(tick).format('MMM \'YY') }/>
 
-                                                <YAxis yAxisId="left" orientation="left" stroke="#99b3bb" domain={[_.minBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric]))),_.maxBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric])))]}/>
+                                                <YAxis yAxisId="left" orientation="left" name='Test' stroke="#99b3bb" domain={[_.minBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric]))),_.maxBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric])))]}
+                                                label={{ value: _.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}).indicator_name + " in %", angle: 270, position: 'insideBottomLeft', offset:10 }}
+                                                padding={{ left: 30 }} 
+                                                />
+
                                                 
                                                 <ReferenceLine y={0} yAxisId="left" stroke="red" label="0%" strokeDasharray="3 3" />
                                                 
@@ -306,7 +330,7 @@ export class Country extends React.Component {
                                     }
                                 </>
                             </div>
-                            
+                            <img id='logo' src={adhLogo} className='d-none' />
                             <hr/>
                             
                             { this.state.selectedMetric != '' ?
@@ -327,6 +351,7 @@ export class Country extends React.Component {
                                 : ''
                             }
 
+                            
                             <hr/>
 
                             <Row className="justify-content-center m-5">
@@ -337,7 +362,7 @@ export class Country extends React.Component {
                                     <p className="text-black-50">Do you have a question about these numbers? Have you spotted a mistake or do they look different to the ones reported in your local press (especially in South Africa)? See <a href="https://africadatahub.org/data-resources/inflation-observer#about" target="_parent">this page</a> for more information about how this data is compiled. </p>
                                 </Col>
                             </Row>
-                            
+                            <SocialMedia />
                         </Card.Body>
                     </Card>
 
