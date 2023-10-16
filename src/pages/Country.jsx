@@ -175,7 +175,13 @@ export class Country extends React.Component {
             ]
         }`;
 
+        const font_script = document.createElement('script');
+        font_script.type = 'text/javascript';
+        font_script.src = "https://kit.fontawesome.com/704ff50790.js"
+        font_script.crossOrigin = "anonymous"
+
         document.head.appendChild(script);
+        document.head.appendChild(font_script);
     
     }
     
@@ -203,7 +209,7 @@ export class Country extends React.Component {
         
 
         let image = new Image();
-        image.crossOrigin = "Anonymous"; 
+        image.crossOrigin = "anonymous"; 
         image.onload = () => {
             let canvas = document.createElement('canvas');
             canvas.width = width+10;
@@ -330,7 +336,7 @@ export class Country extends React.Component {
                                     }
                                 </>
                             </div>
-                            <img id='logo' src={adhLogo} className='d-none' />
+                            <img id='logo' src={adhLogo} className='d-none' crossorigin="anonymous" />
                             <hr/>
                             
                             { this.state.selectedMetric != '' ?
