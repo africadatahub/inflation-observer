@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
 
-const randomClass = 'unique-' + Math.random().toString(36).substring(2, 8);
+//const randomClass = 'unique-' + Math.random().toString(36).substring(2, 8);
+const randomClass = 'unique-oo0kza'
 
 // Find the name of the generated CSS file
 const files = glob.sync('dist/*.css');
