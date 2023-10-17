@@ -212,8 +212,8 @@ export class Country extends React.Component {
         image.crossOrigin = "anonymous"; 
         image.onload = () => {
             let canvas = document.createElement('canvas');
-            canvas.width = width+10;
-            canvas.height = height+100;
+            canvas.width = width+130;
+            canvas.height = height+130;
             let context = canvas.getContext('2d');
             context.fillStyle = 'rgba(255,255,255,1)';
             context.fillRect(0,0,canvas.width,canvas.height);
@@ -233,8 +233,8 @@ export class Country extends React.Component {
             context.drawImage(logo, context.canvas.width-logo.width-30, 10);
 
 
-            context.drawImage(image, 0, 100, context.canvas.width-10, context.canvas.height-100);
-            let jpeg = canvas.toDataURL('image/jpeg', 1.0);
+            context.drawImage(image, 20, 100, context.canvas.width-30, context.canvas.height-130);
+            let jpeg = canvas.toDataURL('image/png', 1.0);
             saveAs(jpeg, self.state.selectedCountry.location.replace(' ', '-') + '--' + _.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}).indicator_name);
         };
 
@@ -345,10 +345,10 @@ export class Country extends React.Component {
                                         <span className="text-black-50">Select a time period to show and download an image to share.</span>
                                     </Col>
                                     <Col xs={12} md="auto" className={window.innerWidth < 800 ? 'text-center my-3' : 'my-0'}>
-                                        <Button onClick={() => this.downloadData()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} />Download Data</Button>
+                                        <Button onClick={() => this.downloadData()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} /> Download Data</Button>
                                     </Col>
                                     <Col xs={12} md="auto" className={window.innerWidth < 800 ? 'text-center my-3' : 'my-0'}>
-                                        <Button onClick={() => this.downloadChart()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} />Download Image</Button>
+                                        <Button onClick={() => this.downloadChart()} variant="light-grey" style={{color: "#094151"}}><FontAwesomeIcon icon={faFileDownload} /> Download Image</Button>
                                     </Col>
                                     <Col md="auto" className="align-self-center">
                                         <span className="text-black-50">Source: <a className="text-black-50" target="_blank" href={_.filter(settings.texts, function(def) { return def.name == 'source'})[0].link}>{_.filter(settings.texts, function(def) { return def.name == 'source'})[0].link_text}</a></span>

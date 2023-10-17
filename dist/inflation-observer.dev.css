@@ -1080,7 +1080,8 @@
 .unique-oo0kza .reddit{background-color:#ff4500}
 .unique-oo0kza .whatsapp{background-color:#25d366}
 .unique-oo0kza .btn-embed{color:#333;cursor:pointer;border:none;border-radius:5px;padding:8px 16px;font-size:16px}
-.unique-oo0kza #iframe1 textarea{width:100%}@keyframes progress-bar-stripes{0%{background-position-x:14px}}
+.unique-oo0kza #iframe1 textarea{width:100%}
+.unique-oo0kza .modal.show .modal-dialog{margin-top:40vh}@keyframes progress-bar-stripes{0%{background-position-x:14px}}
 @keyframes spinner-border{to{transform:rotate(360deg)}}
 @keyframes spinner-grow{0%{transform:scale(0)}50%{opacity:1;transform:none}}
 @keyframes placeholder-glow{50%{opacity:.2}}
