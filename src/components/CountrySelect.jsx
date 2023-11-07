@@ -38,7 +38,7 @@ export class CountrySelect extends React.Component {
         return (
         <DropdownButton size="lg" title={this.isCountryPage()} className="country-select">
             {countriesList.map((country,index) => (
-                <Dropdown.Item key={country.iso_code} onClick={ () => { window.location.href = '/' + locationToUrl(country.location); } }>
+                <Dropdown.Item key={country.iso_code} onClick={ () => { window.location.href = '?country=' + locationToUrl(country.location); } }>
                     <div style={{width: '1.5em', height: '1.5em', borderRadius: '50%', overflow: 'hidden', position: 'relative', display: 'inline-block'}} className="border">
                         <ReactCountryFlag
                         svg

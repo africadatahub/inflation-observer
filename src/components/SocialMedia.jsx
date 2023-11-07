@@ -9,7 +9,6 @@ const SocialMedia = () => {
         var iframe = `<iframe width="700" height="400" src="${url}" frameBorder="0"></iframe>`;
         div.innerHTML = iframe;
         var element = document.getElementById('iframe1');
-        iframe.src = url
 
         if (!element.hasChildNodes()) {
             // It has at least one

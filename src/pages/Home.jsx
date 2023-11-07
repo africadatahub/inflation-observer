@@ -16,8 +16,9 @@ export class Home extends React.Component {
 
     render() {
         return (
-            <div className="d-flex justify-content-center align-items-center mt-4">
-                
+            <div className="d-flex justify-content-center align-items-center pt-4">
+                <span className="fs-5">Select countries to visualise</span><br/>
+                <CountrySelect />
             </div>
         );
     }
