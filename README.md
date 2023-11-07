@@ -34,5 +34,5 @@ To deploy the application, follow these steps:
 9. If you want to push to the development environment (i.e., africadata.webflow.io), rename or copy the CSS and JS files to "inflation-observer.dev.css" and "inflation-observer.dev.js." Otherwise, rename or copy them to "inflation-observer.css" and "inflation-observer.js" to update the GitHub Pages.
 
 # Links
-[Staging Link](https://africadatahub.webflow.io/)
-[Production Link](https://www.africadatahub.org/)
+1. [Staging Link](https://africadatahub.webflow.io/)
+2. [Production Link](https://www.africadatahub.org/)
