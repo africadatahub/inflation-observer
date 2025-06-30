@@ -62,27 +62,47 @@ export class Country extends React.Component {
     }
 
     componentDidMount() {
-        
         let self = this;
 
         let searchTerms = document.location.search.split('&');
-
         let countrySearch = searchTerms.filter(term => term.includes('country='))[0];
-
         let country = urlToLocation(countrySearch.split('=')[1]);
 
-
-
-        if(country != undefined) {
-
-            axios.get(settings.api.url + 'action/datastore_search_sql?sql=SELECT%20*%20from%20"' + settings.api.countryData + '"%20WHERE%20iso_code%20LIKE%20%27' + country.iso_code + '%27',
-                { headers: {
-                    "Authorization": process.env.CKAN
+        if (country != undefined) {
+            axios.get(
+                settings.api.url + '?q=' + country.iso_code + '&resource_id=' + settings.api.countryData,
+                {
+                    headers: {
+                        "Authorization": process.env.CKAN
+                    }
                 }
-            })
+            )
             .then(function(response) {
-                
-                let records = _.sortBy(response.data.result.records, ['date']);
+                // Transform the API response
+                let apiRecords = response.data.result.records;
+
+                // Get all date keys from the first record (keys that match the date pattern)
+                let dateKeys = Object.keys(apiRecords[0]).filter(
+                    key => /^unsafe_\d{4}_\d{2}_\d{2}$/.test(key)
+                );
+
+                // For each date, create a record with date and all indicator values
+                let records = [];
+                dateKeys.forEach(dateKey => {
+                    // Compose date string from key, e.g., 'unsafe_2008_01_31' => '2008-01-31'
+                    let date = dateKey.replace('unsafe_', '').replace(/_/g, '-');
+                    let record = { date };
+
+                    // For each indicator, add its value for this date
+                    apiRecords.forEach(indicatorRecord => {
+                        record[indicatorRecord.indicator_code] = indicatorRecord[dateKey];
+                    });
+
+                    records.push(record);
+                });
+
+                // Sort by date
+                records = _.sortBy(records, ['date']);
 
                 country.annual_rates = annualRates.find(cntry => cntry.country_code == country.iso_code);
                 country.url = locationToUrl(country.location);
@@ -96,15 +116,13 @@ export class Country extends React.Component {
                 }, () => {
                     self.addMetadata();
                 });
-
-
-
-
-
-
-                
             })
-
+            .catch(function(error) {
+                console.log(error);
+                self.setState({
+                    loading: false
+                });
+            });
         }
     }
 
@@ -336,7 +354,7 @@ export class Country extends React.Component {
                                     }
                                 </>
                             </div>
-                            <img id='logo' src={adhLogo} className='d-none' crossorigin="anonymous" />
+                            <img id='logo' src={adhLogo} className='d-none' crossOrigin="anonymous" />
                             <hr/>
                             
                             { this.state.selectedMetric != '' ?
