@@ -11,9 +11,9 @@
         "selectedBaseMetric": "PCPI_PC_CP_A_PT"
     },
     "api": {
-        "url": "https://ckan.africadatahub.org/api/3/",
-        "overviewData": "bb8eb75e-6470-40dd-907c-da205a5b95ba",
-        "countryData": "bb8eb75e-6470-40dd-907c-da205a5b95ba"
+        "url": "https://ckan.africadatahub.org/api/action/datastore_search",
+        "overviewData": "56d80035-ba9a-49f8-a670-70be4dd50ce4",
+        "countryData": "56d80035-ba9a-49f8-a670-70be4dd50ce4"
     },
     "indicators": [
         {
