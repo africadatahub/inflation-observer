@@ -107,6 +107,9 @@ export class Country extends React.Component {
                 country.annual_rates = annualRates.find(cntry => cntry.country_code == country.iso_code);
                 country.url = locationToUrl(country.location);
 
+                country.annual_rates = annualRates.find(cntry => cntry.country_code == country.iso_code);
+                country.url = locationToUrl(country.location);
+
                 self.setState({
                     selectedCountry: country,
                     selectedCountryIso2: getCountryISO2(country.iso_code),
@@ -116,6 +119,13 @@ export class Country extends React.Component {
                 }, () => {
                     self.addMetadata();
                 });
+
+
+
+
+
+
+                
             })
             .catch(function(error) {
                 console.log(error);
