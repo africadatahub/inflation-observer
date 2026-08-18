@@ -22,10 +22,24 @@ const path = require('path');
 const SOURCE = path.join(__dirname, '..', 'src', 'data', 'source', 'combined_imf_database.csv');
 const TARGET = path.join(__dirname, '..', 'src', 'data', 'inflation.json');
 
-// CKAN prefixes any column starting with a digit with `unsafe_` on ingest, and
-// swaps the dashes for underscores. Accept both that and a plain date heading,
-// so the script also works against a CSV taken straight from the pipeline.
+/*
+ * Two spellings of the same file are in circulation, and both are accepted:
+ *
+ *   Straight from the pipeline   `Indicator.Code`, `Geography`, `2025-07-31`
+ *   Dumped back out of CKAN      `indicator_code`, `Geography`, `unsafe_2025_07_31`
+ *
+ * CKAN lowercases headings, replaces dots with underscores, and prefixes any
+ * column starting with a digit with `unsafe_`, so a round trip through the
+ * portal renames most of the file.
+ */
 const DATE_COLUMN = /^(?:unsafe_)?(\d{4})[-_](\d{2})[-_](\d{2})$/;
+
+const normalise = (heading) => heading.trim().toLowerCase().replace(/[.\-\s]/g, '_');
+
+const findColumn = (header, ...names) => {
+    let wanted = names.map(normalise);
+    return header.findIndex(heading => wanted.includes(normalise(heading)));
+};
 
 // Minimal RFC 4180 reader — the indicator names contain commas ("Consumer
 // Price Index, All items"), so splitting on commas alone is not enough.
@@ -87,11 +101,14 @@ if (rows.length < 2) {
 }
 
 const header = rows[0];
-const isoColumn = header.indexOf('Geography');
-const indicatorColumn = header.indexOf('indicator_code');
+const isoColumn = findColumn(header, 'Geography', 'iso_code');
+const indicatorColumn = findColumn(header, 'indicator_code', 'Indicator.Code');
 
 if (isoColumn === -1 || indicatorColumn === -1) {
-    throw new Error('CSV is missing a Geography or indicator_code column');
+    throw new Error(
+        'CSV needs a country column (Geography / iso_code) and an indicator column ' +
+        '(Indicator.Code / indicator_code). Found: ' + header.slice(0, 8).join(', ')
+    );
 }
 
 const dateColumns = [];
@@ -140,16 +157,54 @@ const output = {
     countries
 };
 
+const countValues = (grid) => grid.reduce((n, series) => n + series.filter(v => v !== null).length, 0);
+
+// Compare against the file being replaced before overwriting it. A partial
+// export is the failure mode worth catching here: the `reshaped` resource on
+// CKAN has silently been truncated to five countries before now, and a short
+// CSV would otherwise regenerate cleanly and quietly drop data from the site.
+let previous = null;
+if (fs.existsSync(TARGET)) {
+    try {
+        previous = JSON.parse(fs.readFileSync(TARGET, 'utf8'));
+    } catch (error) {
+        console.warn(`  (could not read the existing ${path.basename(TARGET)} to compare against)`);
+    }
+}
+
 fs.writeFileSync(TARGET, JSON.stringify(output));
 
-const values = Object.values(countries).length * indicators.length * output.dates.length;
-const populated = Object.values(countries)
-    .reduce((total, grid) => total + grid.reduce((n, s) => n + s.filter(v => v !== null).length, 0), 0);
+const total = Object.keys(countries).length * indicators.length * output.dates.length;
+const populated = Object.values(countries).reduce((n, grid) => n + countValues(grid), 0);
 
 console.log(`Wrote ${path.relative(process.cwd(), TARGET)}`);
 console.log(
     `  ${Object.keys(countries).length} countries x ${indicators.length} indicators x ${output.dates.length} months` +
     ` (${output.dates[0]} to ${output.dates[output.dates.length - 1]})`
 );
-console.log(`  ${populated.toLocaleString()} of ${values.toLocaleString()} values present`);
+console.log(`  ${populated.toLocaleString()} of ${total.toLocaleString()} values present`);
 console.log(`  ${(fs.statSync(TARGET).size / 1024).toFixed(0)} KB on disk`);
+
+if (previous && previous.countries) {
+    let added = Object.keys(countries).filter(iso => !previous.countries[iso]);
+    let dropped = Object.keys(previous.countries).filter(iso => !countries[iso]);
+    let lost = Object.keys(countries)
+        .filter(iso => previous.countries[iso])
+        .map(iso => ({ iso, delta: countValues(countries[iso]) - countValues(previous.countries[iso]) }))
+        .filter(c => c.delta < 0);
+
+    let previousPopulated = Object.values(previous.countries).reduce((n, grid) => n + countValues(grid), 0);
+    let newMonths = output.dates.filter(d => !previous.dates.includes(d));
+
+    console.log('\nAgainst the previous build:');
+    console.log(`  ${(populated - previousPopulated >= 0 ? '+' : '') + (populated - previousPopulated).toLocaleString()} values` +
+        (newMonths.length ? `, ${newMonths.length} new month(s) to ${newMonths[newMonths.length - 1]}` : ', no new months'));
+    if (added.length) console.log(`  added: ${added.join(', ')}`);
+
+    if (dropped.length || lost.length) {
+        console.error('\n  ⚠ THIS BUILD LOSES DATA — check the CSV is a complete export before committing');
+        if (dropped.length) console.error(`    countries gone: ${dropped.join(', ')}`);
+        if (lost.length) console.error(`    fewer values: ${lost.map(c => `${c.iso} (${c.delta})`).join(', ')}`);
+        process.exitCode = 1;
+    }
+}
