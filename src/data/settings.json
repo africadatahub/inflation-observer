@@ -1,6 +1,6 @@
 {
     "title": "Africa Observer: Consumer Price Inflation (CPI)",
-    "subtitle": "Search and visualise inflation indicators for African countries (2008-2022)",
+    "subtitle": "Search and visualise inflation indicators for African countries (2008-2025)",
     "map": {
         "selectedBaseMetric": "PCPI_PC_CP_A_PT"
     },
@@ -9,11 +9,6 @@
     },
     "countryChart": {
         "selectedBaseMetric": "PCPI_PC_CP_A_PT"
-    },
-    "api": {
-        "url": "https://ckan.africadatahub.org/api/action/datastore_search",
-        "overviewData": "56d80035-ba9a-49f8-a670-70be4dd50ce4",
-        "countryData": "56d80035-ba9a-49f8-a670-70be4dd50ce4"
     },
     "indicators": [
         {
@@ -72,8 +67,7 @@
     "texts": [
         {
             "name": "source",
-            // "link": "https://ckan.africadatahub.org/dataset/inflation-data-for-africa/resource/15b5b9eb-e68e-461c-8f8e-7bd0c69dcd14",
-            "link": "https://ckan.africadatahub.org/dataset/imf-africa-inflation-database/resource/626c5497-a3d2-461f-9f51-8485d94e36b3",
+            "link": "https://ckan.africadatahub.org/dataset/imf-africa-inflation-database",
             "link_text": "IMF, Various national agencies, Africa Data Hub"
         },
         {

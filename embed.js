@@ -836,7 +836,7 @@ if(location.pathname.includes('inflation-observer')) {
                  {
                     "@type":"DataDownload",
                     "encodingFormat":"CSV",
-                    "contentUrl":"https://ckan.africadatahub.org/datastore/dump/626c5497-a3d2-461f-9f51-8485d94e36b3?bom=True"
+                    "contentUrl":"https://raw.githubusercontent.com/africadatahub/inflation-observer/master/src/data/source/combined_imf_database.csv"
                  }
               ]
           }`;

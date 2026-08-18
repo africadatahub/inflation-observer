@@ -1,6 +1,5 @@
 import React from 'react';
 
-import axios from 'axios';
 import _ from 'lodash';
 import moment from 'moment';
 
@@ -32,6 +31,30 @@ import adhLogo from '../adh-logo.png'
 
 
 import * as annualRates from '../data/annual-rates.json';
+import * as inflation from '../data/inflation.json';
+
+// The bundled dataset is columnar — one array of monthly values per indicator,
+// all sharing inflation.dates — which keeps it small. The chart wants one
+// object per month, so expand a country's grid on the way into state.
+const buildRecords = (indicatorSeries) => inflation.dates.map((date, monthIndex) => {
+    let record = { date };
+
+    inflation.indicators.forEach((indicatorCode, indicatorIndex) => {
+        record[indicatorCode] = indicatorSeries[indicatorIndex][monthIndex];
+    });
+
+    return record;
+});
+
+// Four countries carry an annual-rates row with no usable figure in it, and two
+// are in the picker with no row at all. Return nothing rather than 'NaN%'.
+const headlineRate = (rates) => {
+    if (rates == undefined || !rates.last_full_year) return undefined;
+
+    let value = parseFloat(rates[rates.last_full_year]);
+
+    return isNaN(value) ? undefined : { year: rates.last_full_year, value: Math.round(value * 100) / 100 };
+};
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -68,72 +91,26 @@ export class Country extends React.Component {
         let countrySearch = searchTerms.filter(term => term.includes('country='))[0];
         let country = urlToLocation(countrySearch.split('=')[1]);
 
-        if (country != undefined) {
-            axios.get(
-                settings.api.url + '?q=' + country.iso_code + '&resource_id=' + settings.api.countryData,
-                {
-                    headers: {
-                        "Authorization": process.env.CKAN
-                    }
-                }
-            )
-            .then(function(response) {
-                // Transform the API response
-                let apiRecords = response.data.result.records;
-
-                // Get all date keys from the first record (keys that match the date pattern)
-                let dateKeys = Object.keys(apiRecords[0]).filter(
-                    key => /^unsafe_\d{4}_\d{2}_\d{2}$/.test(key)
-                );
-
-                // For each date, create a record with date and all indicator values
-                let records = [];
-                dateKeys.forEach(dateKey => {
-                    // Compose date string from key, e.g., 'unsafe_2008_01_31' => '2008-01-31'
-                    let date = dateKey.replace('unsafe_', '').replace(/_/g, '-');
-                    let record = { date };
-
-                    // For each indicator, add its value for this date
-                    apiRecords.forEach(indicatorRecord => {
-                        record[indicatorRecord.indicator_code] = indicatorRecord[dateKey];
-                    });
-
-                    records.push(record);
-                });
-
-                // Sort by date
-                records = _.sortBy(records, ['date']);
-
-                country.annual_rates = annualRates.find(cntry => cntry.country_code == country.iso_code);
-                country.url = locationToUrl(country.location);
-
-                country.annual_rates = annualRates.find(cntry => cntry.country_code == country.iso_code);
-                country.url = locationToUrl(country.location);
-
-                self.setState({
-                    selectedCountry: country,
-                    selectedCountryIso2: getCountryISO2(country.iso_code),
-                    selectedMetric: settings.countryChart.selectedBaseMetric,
-                    data: records,
-                    loading: false
-                }, () => {
-                    self.addMetadata();
-                });
-
-
-
-
-
-
-                
-            })
-            .catch(function(error) {
-                console.log(error);
-                self.setState({
-                    loading: false
-                });
-            });
+        if (country == undefined) {
+            this.setState({ loading: false });
+            return;
         }
+
+        country.annual_rates = annualRates.find(cntry => cntry.country_code == country.iso_code);
+        country.url = locationToUrl(country.location);
+
+        // Eritrea and Saint Helena are in the picker but have no series.
+        let indicatorSeries = inflation.countries[country.iso_code];
+
+        this.setState({
+            selectedCountry: country,
+            selectedCountryIso2: getCountryISO2(country.iso_code),
+            selectedMetric: settings.countryChart.selectedBaseMetric,
+            data: indicatorSeries == undefined ? undefined : buildRecords(indicatorSeries),
+            loading: false
+        }, () => {
+            self.addMetadata();
+        });
     }
 
 
@@ -198,7 +175,7 @@ export class Country extends React.Component {
                 {
                     "@type":"DataDownload",
                     "encodingFormat":"CSV",
-                    "contentUrl":"https://ckan.africadatahub.org/datastore/dump/626c5497-a3d2-461f-9f51-8485d94e36b3?bom=True"
+                    "contentUrl":"https://raw.githubusercontent.com/africadatahub/inflation-observer/master/src/data/source/combined_imf_database.csv"
                 }
             ]
         }`;
@@ -281,8 +258,10 @@ export class Country extends React.Component {
     render() {
         let self = this;
 
-       
-        
+        let country = this.state.selectedCountry;
+        let headline = country != undefined ? headlineRate(country.annual_rates) : undefined;
+        let extraNotes = country != undefined && country.annual_rates != undefined ? country.annual_rates.Extra_notes : '';
+
         return (
             <div>
                 <Container className="py-4">  
@@ -320,10 +299,11 @@ export class Country extends React.Component {
                                         }</h4>
                                     }
                                     
-                                    { this.state.selectedCountry != undefined &&
-                                    <>
-                                    <p className="mt-3 fs-5 text-black-60"><strong>{this.state.selectedCountry.location}</strong>'s consumer price inflation (CPI) rate for the full year <strong>{this.state.selectedCountry.annual_rates.last_full_year}</strong> was <strong>{Math.round(this.state.selectedCountry.annual_rates[this.state.selectedCountry.annual_rates.last_full_year] * 100) / 100}%</strong>.</p>{this.state.selectedCountry.annual_rates.Extra_notes != '' ? <p className="mt-3 fs-5 text-black-60">{this.state.selectedCountry.annual_rates.Extra_notes}</p> : ''}
-                                    </>
+                                    { headline != undefined &&
+                                        <p className="mt-3 fs-5 text-black-60"><strong>{country.location}</strong>'s consumer price inflation (CPI) rate for the full year <strong>{headline.year}</strong> was <strong>{headline.value}%</strong>.</p>
+                                    }
+                                    { extraNotes != undefined && extraNotes != '' &&
+                                        <p className="mt-3 fs-5 text-black-60">{extraNotes}</p>
                                     }
                                     <p className="fs-5 mt-3 text-black-50">Numbers are percentage change, year on year</p>
                                 </Col>
@@ -362,12 +342,18 @@ export class Country extends React.Component {
                                             </ComposedChart>
                                         </ResponsiveContainer>)
                                     }
+                                    {!this.state.loading && this.state.data == undefined && (
+                                        <div className="text-center py-5">
+                                            <h4 className="text-black-50">No inflation data for {country != undefined ? country.location : 'this country'}</h4>
+                                            <p className="text-black-50 mb-0">This country is not yet covered by the IMF and Africa Data Hub inflation database. Try another country from the dropdown above.</p>
+                                        </div>)
+                                    }
                                 </>
                             </div>
                             <img id='logo' src={adhLogo} className='d-none' crossOrigin="anonymous" />
                             <hr/>
                             
-                            { this.state.selectedMetric != '' ?
+                            { this.state.selectedMetric != '' && this.state.data != undefined ?
                                 <Row className="justify-content-between">
                                     <Col className="align-self-center">
                                         <span className="text-black-50">Select a time period to show and download an image to share.</span>

@@ -6,6 +6,7 @@
     "license": "MIT",
     "scripts": {
         "dev": "parcel src/index.html",
+        "data:build": "node scripts/build-inflation-data.js",
         "build": "copyfiles --flat ./src/inflation-observer.png ./dist && copyfiles --flat ./src/adh-logo.svg ./dist && copyfiles --flat ./src/adh-favicon.png ./dist && parcel build ./src/index.html && node post-build-script.js"
     },
     "dependencies": {

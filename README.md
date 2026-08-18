@@ -4,7 +4,7 @@ The Africa Data Hub Inflation Observer helps journalists, researchers, and civil
 
 - [Production](https://www.africadatahub.org/dashboards/inflation-observer)
 - [Staging](https://africadatahub.webflow.io/)
-- [CKAN dataset](https://ckan.africadatahub.org/dataset/imf-africa-inflation-database)
+- [Upstream dataset](https://ckan.africadatahub.org/dataset/imf-africa-inflation-database)
 
 ## What the dashboard does
 
@@ -17,11 +17,11 @@ On a country page you can:
 
 - Switch between headline CPI and COICOP categories (food, housing, transport, health, and so on).
 - Brush the x-axis to focus on a time range.
-- Read the latest full-year headline rate (from the bundled annual-rates file).
+- Read the latest full-year headline rate (from the bundled annual-rates file), where one is available.
 - Download the selected series as CSV, or the chart as a PNG.
 - Share the page on Facebook, Twitter/X, or WhatsApp, or copy an iframe embed snippet.
 
-All chart values are **percentage change, year on year**. Historical coverage starts in 2008.
+All chart values are **percentage change, year on year**. Coverage runs from **2008-01** to **2025-12**, with data through **2025-10**.
 
 Country URLs use a slug of the name in `src/data/countries.json` (spaces become hyphens). Special cases: `cote-d-ivoire` and `guinea-bissau`.
 
@@ -45,17 +45,18 @@ There are two data layers.
 
 | Layer | What it powers | Source |
 | --- | --- | --- |
-| Monthly time series | The country chart | CKAN Datastore API, live at runtime |
+| Monthly time series | The country chart | `src/data/inflation.json`, compiled into the bundle at build time |
 | Annual headline rates | “CPI for full year YYYY was X%”, plus SEO intro copy | Bundled JSON in this repo (also duplicated in `embed.js`) |
 
-Chart indicators and the CKAN resource id live in `src/data/settings.json`. The default series is IMF code `PCPI_PC_CP_A_PT` (Consumer Price Index, all items). Other options are the standard COICOP groups.
+**The app makes no network requests for data.** Everything it charts is compiled into the JavaScript bundle. It was previously read from the ADH CKAN Datastore at runtime; see [Migrating off CKAN](#migrating-off-ckan) below.
 
-The country page queries CKAN with the country’s ISO-3 code, then pivots rows (one per indicator) into date records. Date columns in the datastore look like `unsafe_2008_01_31` and are turned into `2008-01-31`.
+Chart indicators live in `src/data/settings.json`. The default series is IMF code `PCPI_PC_CP_A_PT` (Consumer Price Index, all items). Other options are the standard COICOP groups.
 
 ### Where it lives
 
-- **Monthly series (authoritative):** [IMF Africa Inflation Database](https://ckan.africadatahub.org/dataset/imf-africa-inflation-database) on the ADH CKAN portal. The app reads resource `56d80035-ba9a-49f8-a670-70be4dd50ce4` via `datastore_search`. The public CSV dump linked from the UI is resource `626c5497-a3d2-461f-9f51-8485d94e36b3`.
-- **Pipeline that builds that CKAN dataset:** [adh_inflation_database_v2](https://github.com/africadatahub/adh_inflation_database_v2) (IMF CPI plus scrapes from national statistics offices / central banks).
+- **Monthly series (as shipped):** `src/data/inflation.json`, generated from the CSV snapshot in `src/data/source/combined_imf_database.csv`.
+- **Monthly series (authoritative):** the [IMF Africa Inflation Database](https://ckan.africadatahub.org/dataset/imf-africa-inflation-database) resource `56d80035-ba9a-49f8-a670-70be4dd50ce4`, which the snapshot is taken from.
+- **Pipeline that builds that dataset:** [adh_inflation_database_v2](https://github.com/africadatahub/adh_inflation_database_v2) (IMF CPI plus scrapes from national statistics offices / central banks).
 - **Annual rates in this repo:** `src/data/annual-rates.json` (consumed by the React app) and the same objects inside `embed.js` (consumed on the host page).
 - **Country list:** `src/data/countries.json` (ISO-3 + display name).
 
@@ -71,7 +72,19 @@ The country page queries CKAN with the country’s ISO-3 code, then pivots rows 
 | `last_full_year` | Latest year with a usable annual figure |
 | `Extra_notes` | Optional caveat shown under the headline rate |
 
-**CKAN monthly resource** — one row per country × indicator. Identifier fields include `indicator_code` and the country ISO-3; remaining keys are `unsafe_YYYY_MM_DD` month-end values.
+**Monthly series** (`src/data/inflation.json`) — columnar, so every country shares one date axis:
+
+```json
+{
+  "dates":      ["2008-01-31", "2008-02-29", "..."],
+  "indicators": ["PCPIA_PC_CP_A_PT", "..."],
+  "countries":  { "KEN": [[4.53, null, "..."], "..."] }
+}
+```
+
+`countries[iso]` is an indicator × date grid in `indicators` order, and every country gets a full grid — missing months are `null`. `Country.jsx` expands one country's grid into the `[{ date, INDICATOR_CODE: value }]` rows the chart consumes.
+
+**Snapshot CSV** (`src/data/source/combined_imf_database.csv`) — the pipeline output, one row per country × indicator. Identifier fields include `indicator_code` and `Geography` (ISO-3); remaining columns are month-end values. CKAN prefixes those with `unsafe_` on ingest because they start with a digit, and the generator accepts either spelling. **The columns are not in chronological order** — the generator sorts them.
 
 **Country list** (`src/data/countries.json`):
 
@@ -81,7 +94,18 @@ The country page queries CKAN with the country’s ISO-3 code, then pivots rows 
 
 ### Regenerating the data
 
-Monthly data is not generated in this repo. Update the CKAN resource through the inflation-database pipeline; this app will pick up the new series on the next page load.
+Monthly data is generated from the CSV snapshot:
+
+1. Replace `src/data/source/combined_imf_database.csv` with the latest `*_combined_imf_database.csv` from the [inflation-database pipeline](https://github.com/africadatahub/adh_inflation_database_v2) (`outputs/ckan/`).
+2. Run the generator:
+
+    ```
+    yarn data:build
+    ```
+
+3. Commit both the CSV and the regenerated `src/data/inflation.json`, then rebuild and redeploy — the data ships inside the bundle, so a data change needs a new build.
+
+The generator prints the country/indicator/month counts and the date range; check them against the CSV before committing.
 
 Annual rates are static. To refresh them:
 
@@ -95,15 +119,55 @@ If you add or rename a country, update `src/data/countries.json` as well. Slugs 
 ### Coverage caveats
 
 - Countries are not required to report to the IMF every month. ADH fills gaps from national releases, but some series still end earlier than others.
-- Bundled annual rates currently run through **2022**. Several countries stop earlier (for example Eswatini 2019, Seychelles 2020; Angola, Cabo Verde, Ethiopia, Mali, and Nigeria 2021).
-- Comoros, the DRC, Liberia, and Libya have `#N/A` for every bundled annual year.
-- Eritrea and Saint Helena appear in the country picker but have no annual-rate row.
+- The bundled monthly series covers **2008-01 to 2025-12**, with the last populated month at **2025-10**. 74% of the country × indicator × month grid is populated; the rest are genuine gaps.
+- Bundled annual rates still run through **2022**, three years behind the chart above them. Several countries stop earlier (for example Eswatini 2019, Seychelles 2020; Angola, Cabo Verde, Ethiopia, Mali, and Nigeria 2021).
+- Comoros, the DRC, Liberia, and Libya have `#N/A` for every bundled annual year, so the headline-rate sentence is omitted on those pages rather than printing `NaN%`.
+- Eritrea and Saint Helena appear in the country picker but have no annual-rate row **and no monthly series** — those pages show a "no data" message.
 - South Africa: Stats SA often publishes an urban CPI; this dataset uses **national** CPI so countries remain comparable.
 - Zimbabwe: dual-currency period; the bundled note is for prices in Zimbabwe dollars.
 - Malawi 2022 can be hard to compare year-on-year after a December 2021 CPI rebase. See the [Inflation Observer about page](https://www.africadatahub.org/dashboards/inflation-observer).
 - Reuse is allowed with credit to the **IMF** and **Africa Data Hub**.
 
 Questions or corrections: [info@africadatahub.org](mailto:info@africadatahub.org).
+
+### Migrating off CKAN
+
+The country page used to fetch its series from the ADH CKAN Datastore on every page load:
+
+```
+GET https://ckan.africadatahub.org/api/action/datastore_search?q={ISO3}&resource_id=56d80035-…
+```
+
+That was the app's only runtime data request. It now reads `src/data/inflation.json`, compiled into the bundle. The whole dataset — 53 countries, 13 indicators, 216 months — is 212 KB gzipped, less than the JavaScript that renders it, so there was no query worth serving over a network.
+
+The two paths were checked against each other before the switch: replaying the old CKAN pivot against the live API and diffing it cell by cell gave **16,848 identical values across six countries**, same dates, same order, no rounding loss.
+
+The cost, measured by building twice against the same dependency tree:
+
+| Bundle | Raw | Gzipped |
+| --- | --- | --- |
+| Without the dataset | 1.34 MB | 362 KB |
+| With the dataset | 2.10 MB | 567 KB |
+| **Difference** | **+762 KB** | **+205 KB** |
+
+In exchange there is no API key, no CORS surface, no CDN dependency, and no runtime failure mode. The trade-off is that a data refresh is now a rebuild and redeploy rather than a CKAN re-upload.
+
+What went away with it:
+
+- The `Authorization: process.env.CKAN` header, and the need for a `.env` at build time. **The key that was previously inlined into `dist/inflation-observer.js` on `master` is committed in public git history and should be rotated**, independently of this change.
+- `settings.json`'s `api` block, and the `unsafe_YYYY_MM_DD` column-name workaround.
+- `src/components/DataExplorer.jsx` and `src/pages/DataExplorer.jsx`, which also called CKAN but were never mounted and imported files that no longer exist.
+
+Fixed along the way, all of it reachable from the code path being replaced:
+
+- **Eritrea and Saint Helena** are in the picker but have no series — 55 countries in `countries.json` against 53 in the data. They used to throw inside the fetch and render an empty card; they now show a "no data" message.
+- **Comoros, the DRC, Liberia and Libya** have annual-rates rows where every year is `#N/A` and `last_full_year` is empty, which rendered as `for the full year  was NaN%`. The sentence is omitted when there is no usable figure.
+- The Schema.org `contentUrl` and the **Source** link both pointed at CKAN resource `626c5497-…`, which 404s — it no longer exists in the dataset.
+
+Still pointing at CKAN, and needing a permanent home before the portal is retired:
+
+- The **Source** link in `settings.json` (now the dataset landing page rather than the deleted resource).
+- `includedInDataCatalog` in the Schema.org block in `Country.jsx` and `embed.js`.
 
 ## Local development
 
@@ -113,13 +177,7 @@ Questions or corrections: [info@africadatahub.org](mailto:info@africadatahub.org
     yarn
     ```
 
-2. Add a `.env` in the project root with a valid CKAN API key. The country page reads `process.env.CKAN`:
-
-    ```
-    CKAN=<provided-key-here>
-    ```
-
-3. Start Parcel:
+2. Start Parcel:
 
     ```
     yarn dev
@@ -145,15 +203,17 @@ Then open a country URL such as `http://localhost:1234/?country=kenya`.
 │   │   ├── CountrySelect.jsx
 │   │   └── SocialMedia.jsx  # Share + iframe snippet
 │   ├── data/
-│   │   ├── settings.json    # Indicators, CKAN URL / resource ids, copy
+│   │   ├── settings.json    # Indicators and copy
 │   │   ├── countries.json
+│   │   ├── inflation.json   # Generated monthly series (yarn data:build)
 │   │   ├── annual-rates.json
-│   │   └── annual-rates.csv
+│   │   ├── annual-rates.csv
+│   │   └── source/          # CSV snapshot the generator reads
 │   └── utils/func.js        # location ↔ URL slug
+├── scripts/
+│   └── build-inflation-data.js   # CSV snapshot → src/data/inflation.json
 └── dist/                    # Built CSS/JS served from GitHub Pages
 ```
-
-`src/pages/DataExplorer.jsx` and `src/components/DataExplorer.jsx` are leftover and are not mounted.
 
 ## Hosting & deployment
 
@@ -169,7 +229,7 @@ Built assets are renamed before publish:
 Deploy steps:
 
 1. Open a PR that merges `src` changes into the `iframe` branch.
-2. Confirm the app on that branch with `yarn dev`.
+2. Confirm the app on that branch with `yarn dev`. **A data-only change still needs this full cycle** — `src/data/inflation.json` is compiled into the bundle, so nothing reaches the live widget until a new build is published.
 3. Stop the dev server. Delete `dist/` contents and `.parcel-cache` if a previous build is stale.
 4. Run `yarn build`. The post-build script prints the scoped class (for example `unique-oo0kza`) and wraps `.app` in that class.
 5. Rename or copy the hashed CSS/JS in `dist/` to the staging or production names above, then push so GitHub Pages updates.
@@ -178,11 +238,13 @@ Deploy steps:
 
 ## Third-party services
 
+The app itself calls no third-party service at runtime — the data ships in the bundle.
+
 | Service | Role |
 | --- | --- |
-| [ADH CKAN](https://ckan.africadatahub.org/) | Monthly inflation Datastore API |
-| IMF CPI database | Historical core of the CKAN dataset |
-| National statistics offices / central banks | Monthly updates scraped into the CKAN dataset |
+| IMF CPI database | Historical core of the dataset |
+| National statistics offices / central banks | Monthly updates scraped into the dataset |
+| [ADH CKAN](https://ckan.africadatahub.org/) | Where the upstream dataset is published; no longer read at runtime |
 | GitHub Pages | Hosts `dist/` and the SEO `embed.js` |
 | Webflow | Production and staging Africa Data Hub pages that embed the widget |
 | Font Awesome kit | Share-button icons on the country page |
