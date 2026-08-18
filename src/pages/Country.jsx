@@ -23,15 +23,27 @@ import ReactCountryFlag from 'react-country-flag';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 
-import * as settings from '../data/settings.json';
-import { locationToUrl, urlToLocation } from '../utils/func.js';
-import { Collapse } from 'react-bootstrap';
+import * as settingsModule from '../data/settings.json';
+import { getCountryFromSearch, locationToUrl } from '../utils/func.js';
 import SocialMedia from '../components/SocialMedia';
 
 import adhLogo from '../adh-logo.png'
 
 
-import * as annualRates from '../data/annual-rates.json';
+import * as annualRatesModule from '../data/annual-rates.json';
+
+const settings = settingsModule.default || settingsModule;
+const annualRates = Array.isArray(annualRatesModule) ? annualRatesModule : (annualRatesModule.default || []);
+
+const numericDomain = (data, metric) => {
+    const values = (data || [])
+        .map(day => parseFloat(day[metric]))
+        .filter(value => !isNaN(value));
+    if (!values.length) {
+        return ['auto', 'auto'];
+    }
+    return [Math.min(...values), Math.max(...values)];
+};
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -64,36 +76,28 @@ export class Country extends React.Component {
     componentDidMount() {
         let self = this;
 
-        let searchTerms = document.location.search.split('&');
-        let countrySearch = searchTerms.filter(term => term.includes('country='))[0];
-        let country = urlToLocation(countrySearch.split('=')[1]);
+        let country = getCountryFromSearch();
 
         if (country != undefined) {
             axios.get(
-                settings.api.url + '?q=' + country.iso_code + '&resource_id=' + settings.api.countryData,
-                {
-                    headers: {
-                        "Authorization": process.env.CKAN
-                    }
-                }
+                settings.api.url + '?q=' + country.iso_code + '&resource_id=' + settings.api.countryData
             )
             .then(function(response) {
-                // Transform the API response
-                let apiRecords = response.data.result.records;
+                let apiRecords = response.data.result.records || [];
 
-                // Get all date keys from the first record (keys that match the date pattern)
+                if (!apiRecords.length) {
+                    throw new Error('No inflation records for ' + country.iso_code);
+                }
+
                 let dateKeys = Object.keys(apiRecords[0]).filter(
                     key => /^unsafe_\d{4}_\d{2}_\d{2}$/.test(key)
                 );
 
-                // For each date, create a record with date and all indicator values
                 let records = [];
                 dateKeys.forEach(dateKey => {
-                    // Compose date string from key, e.g., 'unsafe_2008_01_31' => '2008-01-31'
                     let date = dateKey.replace('unsafe_', '').replace(/_/g, '-');
                     let record = { date };
 
-                    // For each indicator, add its value for this date
                     apiRecords.forEach(indicatorRecord => {
                         record[indicatorRecord.indicator_code] = indicatorRecord[dateKey];
                     });
@@ -101,13 +105,9 @@ export class Country extends React.Component {
                     records.push(record);
                 });
 
-                // Sort by date
                 records = _.sortBy(records, ['date']);
 
-                country.annual_rates = annualRates.find(cntry => cntry.country_code == country.iso_code);
-                country.url = locationToUrl(country.location);
-
-                country.annual_rates = annualRates.find(cntry => cntry.country_code == country.iso_code);
+                country.annual_rates = annualRates.find(cntry => cntry.country_code == country.iso_code) || {};
                 country.url = locationToUrl(country.location);
 
                 self.setState({
@@ -119,19 +119,16 @@ export class Country extends React.Component {
                 }, () => {
                     self.addMetadata();
                 });
-
-
-
-
-
-
-                
             })
             .catch(function(error) {
                 console.log(error);
                 self.setState({
                     loading: false
                 });
+            });
+        } else {
+            self.setState({
+                loading: false
             });
         }
     }
@@ -146,17 +143,19 @@ export class Country extends React.Component {
             page_title.innerHTML = `${this.state.selectedCountry.location} Inflation Observer`;
             document.title = `${this.state.selectedCountry.location} Inflation Observer | Africa Data Hub`;
 
-            document.querySelector('meta[name="description"]').setAttribute("content", `Consumer price inflation in ${this.state.selectedCountry.location}, 2008 to the present, including COICOP indicators`);
+            const setMeta = (selector, attr, value) => {
+                const el = document.querySelector(selector);
+                if (el) {
+                    el.setAttribute(attr, value);
+                }
+            };
 
-            document.querySelector('meta[property="og:title"]').setAttribute("content", `${this.state.selectedCountry.location} Inflation Observer | Africa Data Hub`);
-
-            document.querySelector('meta[property="og:description"]').setAttribute("content", `Consumer price inflation in ${this.state.selectedCountry.location}, 2008 to the present, including COICOP indicators`);
-
-            document.querySelector('meta[property="twitter:title"]').setAttribute("content", `${this.state.selectedCountry.location} Inflation Observer | Africa Data Hub`);
-
-            document.querySelector('meta[property="twitter:description"]').setAttribute("content", `Consumer price inflation in ${this.state.selectedCountry.location}, 2008 to the present, including COICOP indicators`);
-
-            document.querySelector('meta[property="og:type"]').setAttribute("content", `website`);
+            setMeta('meta[name="description"]', "content", `Consumer price inflation in ${this.state.selectedCountry.location}, 2008 to the present, including COICOP indicators`);
+            setMeta('meta[property="og:title"]', "content", `${this.state.selectedCountry.location} Inflation Observer | Africa Data Hub`);
+            setMeta('meta[property="og:description"]', "content", `Consumer price inflation in ${this.state.selectedCountry.location}, 2008 to the present, including COICOP indicators`);
+            setMeta('meta[property="twitter:title"]', "content", `${this.state.selectedCountry.location} Inflation Observer | Africa Data Hub`);
+            setMeta('meta[property="twitter:description"]', "content", `Consumer price inflation in ${this.state.selectedCountry.location}, 2008 to the present, including COICOP indicators`);
+            setMeta('meta[property="og:type"]', "content", `website`);
 
             // document.getElementById("countrySelect").value = this.state.selectedCountry.location;
 
@@ -300,7 +299,7 @@ export class Country extends React.Component {
                                 </Col>
                                 <Col>
                                     <Form.Select className="border-0 me-1" style={{backgroundColor: '#F6F6F6', height: '100%'}} onChange={this.selectMetric}>
-                                        { settings.indicators.map((indicator, index) => 
+                                        { (settings.indicators || []).map((indicator) => 
                                             <option key={indicator.indicator_code} value={indicator.indicator_code}>{indicator.indicator_name}</option>
                                         ) }
                                     </Form.Select>
@@ -316,13 +315,13 @@ export class Country extends React.Component {
                                     <h3 className="mb-0 text-primary">Consumer price inflation rates in <mark>{this.state.selectedCountry != undefined ? this.state.selectedCountry.location : ''}</mark>:</h3>
                                     {self.state.selectedMetric != '' &&
                                         <h4 className="mb-0 align-middle">{
-                                        _.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}).indicator_name
+                                        (_.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}) || {}).indicator_name
                                         }</h4>
                                     }
                                     
-                                    { this.state.selectedCountry != undefined &&
+                                    { this.state.selectedCountry != undefined && this.state.selectedCountry.annual_rates && this.state.selectedCountry.annual_rates.last_full_year &&
                                     <>
-                                    <p className="mt-3 fs-5 text-black-60"><strong>{this.state.selectedCountry.location}</strong>'s consumer price inflation (CPI) rate for the full year <strong>{this.state.selectedCountry.annual_rates.last_full_year}</strong> was <strong>{Math.round(this.state.selectedCountry.annual_rates[this.state.selectedCountry.annual_rates.last_full_year] * 100) / 100}%</strong>.</p>{this.state.selectedCountry.annual_rates.Extra_notes != '' ? <p className="mt-3 fs-5 text-black-60">{this.state.selectedCountry.annual_rates.Extra_notes}</p> : ''}
+                                    <p className="mt-3 fs-5 text-black-60"><strong>{this.state.selectedCountry.location}</strong>'s consumer price inflation (CPI) rate for the full year <strong>{this.state.selectedCountry.annual_rates.last_full_year}</strong> was <strong>{Math.round(this.state.selectedCountry.annual_rates[this.state.selectedCountry.annual_rates.last_full_year] * 100) / 100}%</strong>.</p>{this.state.selectedCountry.annual_rates.Extra_notes ? <p className="mt-3 fs-5 text-black-60">{this.state.selectedCountry.annual_rates.Extra_notes}</p> : ''}
                                     </>
                                     }
                                     <p className="fs-5 mt-3 text-black-50">Numbers are percentage change, year on year</p>
@@ -344,8 +343,8 @@ export class Country extends React.Component {
                                             <ComposedChart data={this.state.data} margin={{top: 20, right: 0, bottom: 0, left: 0}}>
                                                 <XAxis dataKey="date" tickFormatter={ tick => moment(tick).format('MMM \'YY') }/>
 
-                                                <YAxis yAxisId="left" orientation="left" name='Test' stroke="#99b3bb" domain={[_.minBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric]))),_.maxBy(this.state.data.map(day => day[this.state.selectedMetric] == 'NaN' ? null : parseFloat(day[this.state.selectedMetric])))]}
-                                                label={{ value: _.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}).indicator_name + " in %", angle: 270, position: 'insideBottomLeft', offset:10 }}
+                                                <YAxis yAxisId="left" orientation="left" name='Test' stroke="#99b3bb" domain={numericDomain(this.state.data, this.state.selectedMetric)}
+                                                label={{ value: ((_.find(settings.indicators, indicator => { return indicator.indicator_code == self.state.selectedMetric}) || {}).indicator_name || '') + " in %", angle: 270, position: 'insideBottomLeft', offset:10 }}
                                                 padding={{ left: 30 }} 
                                                 />
 

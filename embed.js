@@ -783,20 +783,24 @@ if(location.pathname.includes('inflation-observer')) {
             }
 
             let page_title = document.querySelector('h1.hero-title');
-            page_title.innerHTML = `${country_name} Inflation Observer`;
+            if (page_title) {
+                page_title.innerHTML = `${country_name} Inflation Observer`;
+            }
             document.title = `${country_name} Inflation Observer | Africa Data Hub`;
 
-            document.querySelector('meta[name="description"]').setAttribute("content", `Consumer price inflation in ${country_name}, 2008 to the present, including COICOP indicators`);
+            const setMeta = (selector, value) => {
+                const el = document.querySelector(selector);
+                if (el) {
+                    el.setAttribute("content", value);
+                }
+            };
 
-            document.querySelector('meta[property="og:title"]').setAttribute("content", `${country_name} Inflation Observer | Africa Data Hub`);
-
-            document.querySelector('meta[property="og:description"]').setAttribute("content", `Consumer price inflation in ${country_name}, 2008 to the present, including COICOP indicators`);
-
-            document.querySelector('meta[property="twitter:title"]').setAttribute("content", `${country_name} Inflation Observer | Africa Data Hub`);
-
-            document.querySelector('meta[property="twitter:description"]').setAttribute("content", `Consumer price inflation in ${country_name}, 2008 to the present, including COICOP indicators`);
-
-            document.querySelector('meta[property="og:type"]').setAttribute("content", `website`);
+            setMeta('meta[name="description"]', `Consumer price inflation in ${country_name}, 2008 to the present, including COICOP indicators`);
+            setMeta('meta[property="og:title"]', `${country_name} Inflation Observer | Africa Data Hub`);
+            setMeta('meta[property="og:description"]', `Consumer price inflation in ${country_name}, 2008 to the present, including COICOP indicators`);
+            setMeta('meta[property="twitter:title"]', `${country_name} Inflation Observer | Africa Data Hub`);
+            setMeta('meta[property="twitter:description"]', `Consumer price inflation in ${country_name}, 2008 to the present, including COICOP indicators`);
+            setMeta('meta[property="og:type"]', `website`);
 
             const script = document.createElement('script');
             script.type = 'application/ld+json';
@@ -849,9 +853,10 @@ if(location.pathname.includes('inflation-observer')) {
             introPar.style = "width: 100%;max-width: 1440px;margin: 2em auto; padding: 0 5em;font-size: 16px;";
 
             introPar.innerHTML = country_text;
-            const parentDiv = document.getElementById("adh-embed").parentNode;
             let embed = document.getElementById("adh-embed");
-            parentDiv.insertBefore(introPar, embed);
+            if (embed && embed.parentNode) {
+                embed.parentNode.insertBefore(introPar, embed);
+            }
 
         }
     }

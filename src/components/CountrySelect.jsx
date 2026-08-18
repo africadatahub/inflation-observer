@@ -6,19 +6,22 @@ import ReactCountryFlag from 'react-country-flag';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
 
-import * as countriesList from '../data/countries.json';
-
-import { locationToUrl, urlToLocation } from '../utils/func.js';
+import { getCountries, getCountryFromSearch, navigateToCountry } from '../utils/func.js';
 
 export class CountrySelect extends React.Component {
 
     isCountryPage = () => {
+        const country = getCountryFromSearch();
 
-        return (window.location.pathname == null || urlToLocation(window.location.pathname.replace('/','')) == undefined || window.location.pathname == '/') ? 'Select your country' : <>
+        if (!country) {
+            return 'Select your country';
+        }
+
+        return <>
             <div style={{width: '1.5em', height: '1.5em', borderRadius: '50%', overflow: 'hidden', position: 'relative', display: 'inline-block', top: '0.2em', marginRight: '0.4em'}} className="border">
                 <ReactCountryFlag
                 svg
-                countryCode={getCountryISO2(urlToLocation(window.location.pathname.split('/')[1]).iso_code)}
+                countryCode={getCountryISO2(country.iso_code)}
                 style={{
                     position: 'absolute', 
                     top: '30%',
@@ -29,7 +32,7 @@ export class CountrySelect extends React.Component {
                     lineHeight: '2em',
                 }}/>
             </div>
-            <div className="text-black d-inline-block ms-1" style={{position: 'relative', top: '-3px'}}>{urlToLocation(window.location.pathname.split('/')[1]).location}</div>
+            <div className="text-black d-inline-block ms-1" style={{position: 'relative', top: '-3px'}}>{country.location}</div>
         </>
             
     }
@@ -37,8 +40,8 @@ export class CountrySelect extends React.Component {
     render() {
         return (
         <DropdownButton size="lg" title={this.isCountryPage()} className="country-select">
-            {countriesList.map((country,index) => (
-                <Dropdown.Item key={country.iso_code} onClick={ () => { window.location.href = '?country=' + locationToUrl(country.location); } }>
+            {getCountries().map((country) => (
+                <Dropdown.Item key={country.iso_code} onClick={ () => { navigateToCountry(country); } }>
                     <div style={{width: '1.5em', height: '1.5em', borderRadius: '50%', overflow: 'hidden', position: 'relative', display: 'inline-block'}} className="border">
                         <ReactCountryFlag
                         svg

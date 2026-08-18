@@ -1,14 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Home } from './pages/Home';
 import { Country } from './pages/Country';
 
-import { locationToUrl, urlToLocation } from './utils/func.js';
-
 function App() {
+  const [search, setSearch] = useState(document.location.search);
+
+  useEffect(() => {
+    const sync = () => setSearch(document.location.search);
+    window.addEventListener('popstate', sync);
+    window.addEventListener('adh-country-change', sync);
+    return () => {
+      window.removeEventListener('popstate', sync);
+      window.removeEventListener('adh-country-change', sync);
+    };
+  }, []);
+
   return (
     <div>
-        { document.location.search.includes('country=') ? <Country /> : <Home /> }
+        { search.includes('country=') ? <Country key={search} /> : <Home /> }
     </div>
   );
 }

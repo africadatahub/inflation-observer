@@ -27,13 +27,111 @@ Country URLs use a slug of the name in `src/data/countries.json` (spaces become 
 
 ## Embedding
 
-The dashboard is built to sit inside the Africa Data Hub site (Webflow), not to stand alone.
+The dashboard is not a standalone site. Africa Data Hub pages (Webflow) inject the built CSS and JS from GitHub Pages into a `#adh-embed` node. React then mounts on `.app` inside that node.
 
-1. The host page provides a `#adh-embed` container. The React app mounts into `.app` inside that node.
-2. `yarn build` scopes every CSS rule under a unique class (currently `unique-oo0kza` in `post-build-script.js`) so Webflow styles do not leak in or out.
-3. [embed.js](https://africadatahub.github.io/adh-inflation-observer-seo/embed.js) (also copied in this repo as `embed.js`) runs on the host page. When the URL contains `?country=…`, it rewrites the page title, meta tags, Schema.org dataset markup, and an intro paragraph using the same annual-rate figures.
+`yarn build` scopes every CSS rule under a unique class (currently `unique-oo0kza` in `post-build-script.js`) so Webflow styles do not leak in or out. The host page must wrap `.app` in that same class.
 
-Visitors can also embed a country view themselves: the **Embed** button generates:
+### Host-page loader (Webflow)
+
+This is the Embed / script block on the Webflow page. Production uses these working files on GitHub Pages:
+
+- CSS: `https://africadatahub.github.io/inflation-observer/dist/inflation-observer.css`
+- JS: `https://africadatahub.github.io/inflation-observer/dist/inflation-observer.js`
+
+If the host URL contains `webflow`, the same loader swaps in `inflation-observer.dev.css` / `inflation-observer.dev.js`. Paths that contain `climate-observer` load the CO2 widget instead. Any other path falls back to a [Pym.js](https://github.com/nprapps/pym.js) iframe whose `src` is the Webflow CMS field `Resource embed URL`.
+
+The loader injects style overrides so Webflow `.container` / `.col` / `.card` rules do not break the widget, then the CSS, the module script, and the scoped DOM tree (`unique-oo0kza` → `.html` → `.body` → `.app`).
+
+```html
+<div id="adh-embed"></div>
+<script src="https://pym.nprapps.org/pym.v1.min.js"></script>
+<script>
+if(location.pathname.includes('inflation-observer') || location.pathname.includes('climate-observer')) {
+
+	let customClass, cssFile_href, jsFile_src;
+
+	if(location.pathname.includes('inflation-observer')) {
+  	customClass = 'unique-oo0kza';
+    
+    if(window.location.href.includes('webflow')) {
+    	cssFile_href = 'https://africadatahub.github.io/inflation-observer/dist/inflation-observer.dev.css';
+    jsFile_src = 'https://africadatahub.github.io/inflation-observer/dist/inflation-observer.dev.js';
+    } else {
+	    cssFile_href = 'https://africadatahub.github.io/inflation-observer/dist/inflation-observer.css';
+    	jsFile_src = 'https://africadatahub.github.io/inflation-observer/dist/inflation-observer.js';
+    }
+  } else {
+  	customClass = 'unique-lpxjij';
+    
+    if(window.location.href.includes('webflow')) {
+    	cssFile_href = 'https://africadatahub.github.io/co2/dist/co2-dev.css';
+     	jsFile_src = 'https://africadatahub.github.io/co2/dist/co2-dev.js';
+    } else {
+	    cssFile_href = 'https://africadatahub.github.io/co2/dist/co2.css';
+  	  jsFile_src = 'https://africadatahub.github.io/co2/dist/co2.js';
+    }
+  }
+
+	let styleOverride = document.createElement('style');
+  styleOverride.innerHTML = `
+  .${customClass} .container {
+  display: block
+  }
+  .${customClass} .col {
+ 	padding-bottom: unset;
+  }
+  .${customClass} .card {
+  color: unset;
+  background-color: unset;
+  border-radius: unset;
+  padding: unset;
+  text-decoration: unset;
+  display: unset;
+  box-shadow: unset;
+	}`;
+
+	let adhEmbed = document.getElementById("adh-embed");
+  
+  let cssFile = document.createElement('link');
+  cssFile.href= cssFile_href;
+  cssFile.rel="stylesheet"
+  let jsFile = document.createElement('script');
+	jsFile.src= jsFile_src;
+  jsFile.type= "module";
+  adhEmbed.append(styleOverride);
+	adhEmbed.append(cssFile);
+	adhEmbed.append(jsFile);
+  
+  const div1 = document.createElement('div');
+  div1.className = customClass;
+	const innerDiv1 = document.createElement('div');
+  innerDiv1.className = 'html';
+  const bodyDiv1 = document.createElement('div');
+  bodyDiv1.className = 'body';
+  const appDiv1 = document.createElement('div');
+  appDiv1.className = 'app';
+  bodyDiv1.appendChild(appDiv1);
+  innerDiv1.appendChild(bodyDiv1);
+  div1.appendChild(innerDiv1);
+  document.getElementById("adh-embed").appendChild(div1);
+
+
+} else {
+	var pymParent = new pym.Parent('adh-embed', '{{wf:Resource embed URL|Dynamo}}', {});
+}
+
+
+
+</script>
+```
+
+### SEO helper
+
+[embed.js](https://africadatahub.github.io/adh-inflation-observer-seo/embed.js) (also in this repo as `embed.js`) runs on the host page. When the URL contains `?country=…`, it rewrites the title, meta tags, Schema.org dataset markup, and an intro paragraph using the bundled annual-rate figures.
+
+### Visitor iframe
+
+The in-app **Embed** button copies:
 
 ```html
 <iframe width="700" height="400" src="{current-url}" frameBorder="0"></iframe>
