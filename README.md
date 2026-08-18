@@ -94,18 +94,32 @@ Chart indicators live in `src/data/settings.json`. The default series is IMF cod
 
 ### Regenerating the data
 
-Monthly data is generated from the CSV snapshot:
+Monthly data is generated from the CSV snapshot. **The data ships inside the bundle, so an update is not live until a new build is deployed** — there is no longer a step that changes what visitors see without a release.
 
-1. Replace `src/data/source/combined_imf_database.csv` with the latest `*_combined_imf_database.csv` from the [inflation-database pipeline](https://github.com/africadatahub/adh_inflation_database_v2) (`outputs/ckan/`).
-2. Run the generator:
+1. Get the new CSV. Either works, and both produce identical output:
+
+    - from the [inflation-database pipeline](https://github.com/africadatahub/adh_inflation_database_v2), `outputs/ckan/YYYY-MM-DD_combined_imf_database.csv`; or
+    - while the portal is still up, straight out of CKAN:
+
+        ```
+        curl -o src/data/source/combined_imf_database.csv           https://ckan.africadatahub.org/datastore/dump/56d80035-ba9a-49f8-a670-70be4dd50ce4
+        ```
+
+2. Put it at `src/data/source/combined_imf_database.csv`, replacing what is there.
+3. Run the generator:
 
     ```
     yarn data:build
     ```
 
-3. Commit both the CSV and the regenerated `src/data/inflation.json`, then rebuild and redeploy — the data ships inside the bundle, so a data change needs a new build.
+4. Read what it prints. It reports the country/indicator/month counts, the date range, and a comparison against the build it just replaced — new months, added countries, and any loss of coverage. **It exits non-zero if the new file has fewer values than the old one**, because a partial export is the likely failure (the `reshaped` resource on CKAN has silently been truncated to five countries before). Do not commit a build that warns.
+5. Commit both the CSV and the regenerated `src/data/inflation.json`.
+6. Build and deploy as under [Hosting & deployment](#hosting--deployment).
 
-The generator prints the country/indicator/month counts and the date range; check them against the CSV before committing.
+Two cases need a second file changed by hand:
+
+- **A country appears in the data that is not in the app.** The generator picks it up automatically, but the picker and the URL slugs come from `src/data/countries.json`. Add it there or it stays unreachable.
+- **A new indicator appears.** It lands in `inflation.json`, but the dropdown is driven by the `indicators` array in `src/data/settings.json`. Add the code and its display name there. The two lists should stay in step in both directions — a code listed in `settings.json` but missing from the data charts as an empty line.
 
 Annual rates are static. To refresh them:
 
